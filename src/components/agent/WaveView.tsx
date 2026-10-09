@@ -13,7 +13,7 @@ const initials = (n: string) => n.split(" ").map((p) => p[0]).join("").slice(0, 
 const TINTS = ["#e0e7ff", "#fce7f3", "#dcfce7", "#fef3c7", "#e0f2fe", "#ede9fe"];
 
 /** Screen 2: who gets wave 1, at what time and price, and why. */
-export function WaveView({ mode, onSent }: { mode: "demo" | "live"; onSent: () => void }) {
+export function WaveView({ mode, onSent, hideSend = false }: { mode: "demo" | "live"; onSent: () => void; hideSend?: boolean }) {
   const [data, setData] = useState<Preview | null>(null);
   const [sending, setSending] = useState(false);
   useEffect(() => { fetch("/api/agent/wave").then((r) => r.json()).then(setData); }, []);
@@ -39,10 +39,10 @@ export function WaveView({ mode, onSent }: { mode: "demo" | "live"; onSent: () =
           <h2 className="text-[17px] font-semibold text-ink">Customers for wave 1</h2>
           <p className="text-[13px] text-muted">Messages go out at 11:30 am from Glow Salon&apos;s WhatsApp number, signed by Sneha.</p>
         </div>
-        <button onClick={send} disabled={sending}
+        {!hideSend && <button onClick={send} disabled={sending}
           className="rounded-lg bg-accent px-4 py-2 text-[13px] font-semibold text-white hover:bg-[#1849d6] disabled:opacity-60">
           {sending ? "Sending…" : mode === "demo" ? "Send wave 1 at 11:30 am" : "Send wave 1 now"}
-        </button>
+        </button>}
       </div>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">

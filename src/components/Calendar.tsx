@@ -2,16 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { BoardData } from "@/lib/useBoardData";
-import type { Booking, Slot } from "@/lib/types";
+import type { Slot } from "@/lib/types";
 import { hhmmToMinutes, istMinutes, rupees } from "@/lib/time";
-
-// Service colours, the way salon calendars colour appointments by service.
-const SERVICE_STYLE: Record<string, { bg: string; bar: string; ink: string }> = {
-  svc_haircut: { bg: "#eaf1ff", bar: "#4f86f7", ink: "#1b3a78" },
-  svc_spa: { bg: "#f2edff", bar: "#8b6cf0", ink: "#40287f" },
-  svc_beard: { bg: "#e7f6ef", bar: "#2ea472", ink: "#145c3d" },
-  svc_colour: { bg: "#fff0e8", bar: "#ef7b4b", ink: "#7a3315" },
-};
 
 const AVATAR_TINTS = ["#fde2e4", "#dbeafe", "#e0e7ff", "#dcfce7", "#fef3c7", "#fce7f3"];
 
@@ -20,23 +12,22 @@ const fmt = (min: number) => {
   const h12 = ((h + 11) % 12) + 1;
   return m ? `${h12}:${String(m).padStart(2, "0")}` : `${h12}`;
 };
+const hourLabel = (min: number) => `${fmt(min)} ${min < 720 ? "am" : "pm"}`;
 
 /**
- * Day view: one column per stylist, time running down, like Fresha or Square Appointments.
- * Appointments in service colours; open time outlined; agent-sold time in amber.
+ * Day view, calm by design: booked time is one quiet grey run per chair, so the eye only
+ * follows empty time and what the agent does with it (offered, kept for walk-ins, sold).
  */
-export function Calendar({ data, pxPerMin = 1 }: { data: BoardData; pxPerMin?: number }) {
-  const { merchant, services, demo, bookings, slots } = data;
+export function Calendar({ data, pxPerMin = 0.95 }: { data: BoardData; pxPerMin?: number }) {
+  const { merchant, demo, bookings, slots } = data;
   const open = hhmmToMinutes(merchant.opens_at);
   const close = hhmmToMinutes(merchant.closes_at);
   const height = (close - open) * pxPerMin;
   const y = (min: number) => (min - open) * pxPerMin;
   const now = istMinutes(demo.clock_at);
-  const serviceName = Object.fromEntries(services.map((s) => [s.id, s.name]));
 
   const parents = new Set(slots.map((s) => s.parent_slot_id).filter(Boolean));
   const visibleSlots = slots.filter((s) => !parents.has(s.id) && s.state !== "cancelled");
-  const visibleBookings = bookings.filter((b) => b.source === "crm" || b.source === "walk_in");
   const flashing = useJustSold(slots);
 
   const hours: number[] = [];
@@ -44,16 +35,13 @@ export function Calendar({ data, pxPerMin = 1 }: { data: BoardData; pxPerMin?: n
 
   return (
     <div className="overflow-x-auto rounded-xl border border-line bg-surface">
-      <div className="min-w-[720px]">
-        {/* stylist header */}
+      <div className="min-w-[640px]">
         <div className="sticky top-0 z-10 flex border-b border-line bg-surface">
           <div className="w-14 shrink-0" />
           {merchant.stylists.map((name, i) => (
             <div key={name} className="flex min-w-0 flex-1 items-center gap-2 border-l border-line px-3 py-2.5">
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12px] font-semibold text-ink-2"
-                style={{ background: AVATAR_TINTS[i % AVATAR_TINTS.length] }}>
-                {name[0]}
-              </span>
+                style={{ background: AVATAR_TINTS[i % AVATAR_TINTS.length] }}>{name[0]}</span>
               <span className="min-w-0">
                 <span className="block truncate text-[13px] font-medium text-ink">{name}</span>
                 <span className="block text-[11px] text-muted">Chair {i + 1}</span>
@@ -63,42 +51,35 @@ export function Calendar({ data, pxPerMin = 1 }: { data: BoardData; pxPerMin?: n
         </div>
 
         <div className="relative flex" style={{ height }}>
-          {/* time gutter */}
           <div className="relative w-14 shrink-0">
-            {hours.map((m) => (
-              <span key={m} className="tnum absolute right-2 -translate-y-1/2 text-[11px] text-faint" style={{ top: y(m) }}>
-                {m === close ? "" : `${fmt(m)}${m < 720 ? " am" : " pm"}`.replace("12 am", "12 pm")}
-              </span>
+            {hours.map((m) => m < close && m > open && (
+              <span key={m} className="tnum absolute right-2 -translate-y-1/2 text-[11px] text-faint" style={{ top: y(m) }}>{hourLabel(m)}</span>
             ))}
           </div>
 
           {merchant.stylists.map((name, idx) => {
             const chair = idx + 1;
+            const runs = bookedRuns(bookings.filter((b) => b.chair === chair && (b.source === "crm" || b.source === "walk_in"))
+              .map((b) => ({ a: istMinutes(b.start_at), b: istMinutes(b.end_at), walkIn: b.source === "walk_in" })));
             return (
               <div key={name} className="relative min-w-0 flex-1 border-l border-line">
-                {hours.slice(0, -1).map((m) => (
-                  <div key={m} className="absolute inset-x-0 border-t border-line" style={{ top: y(m) }}>
-                    <div className="border-t border-dashed border-line/70" style={{ marginTop: 30 * pxPerMin - 1 }} />
+                {hours.slice(1, -1).map((m) => <div key={m} className="absolute inset-x-0 border-t border-line/70" style={{ top: y(m) }} />)}
+                {runs.map((r, i) => (
+                  <div key={i} className="absolute inset-x-1.5 rounded-md bg-[#eef0f3]" style={{ top: y(r.a) + 1.5, height: (r.b - r.a) * pxPerMin - 3 }}>
+                    {r.walkIn && (r.b - r.a) >= 40 && <span className="block px-2 pt-1.5 text-[11px] font-medium text-muted">Walk-in</span>}
                   </div>
-                ))}
-                {visibleBookings.filter((b) => b.chair === chair).map((b) => (
-                  <Appointment key={b.id} booking={b} service={serviceName[b.service_id]}
-                    top={y(istMinutes(b.start_at))} h={(istMinutes(b.end_at) - istMinutes(b.start_at)) * pxPerMin}
-                    start={istMinutes(b.start_at)} end={istMinutes(b.end_at)} />
                 ))}
                 {visibleSlots.filter((s) => s.chair === chair).map((s) => (
                   <OpenTime key={s.id} slot={s} flash={flashing.has(s.id)}
-                    top={y(istMinutes(s.start_at))} h={(istMinutes(s.end_at) - istMinutes(s.start_at)) * pxPerMin}
-                    minutes={istMinutes(s.end_at) - istMinutes(s.start_at)} start={istMinutes(s.start_at)} />
+                    top={y(istMinutes(s.start_at))} minutes={istMinutes(s.end_at) - istMinutes(s.start_at)} pxPerMin={pxPerMin} />
                 ))}
               </div>
             );
           })}
 
-          {/* elapsed time and the current-time line */}
           {now > open && (
             <div className="pointer-events-none absolute inset-y-0 left-14 right-0">
-              <div className="absolute inset-x-0 top-0 bg-white/50" style={{ height: y(Math.min(now, close)) }} />
+              <div className="absolute inset-x-0 top-0 bg-white/55" style={{ height: y(Math.min(now, close)) }} />
             </div>
           )}
           {now > open && now < close && (
@@ -114,66 +95,45 @@ export function Calendar({ data, pxPerMin = 1 }: { data: BoardData; pxPerMin?: n
   );
 }
 
-function Appointment({ booking, service, top, h, start, end }: {
-  booking: Booking; service: string; top: number; h: number; start: number; end: number;
-}) {
-  const style = SERVICE_STYLE[booking.service_id] ?? SERVICE_STYLE.svc_haircut;
-  const name = booking.source === "walk_in" ? "Walk-in" : booking.customers?.name ?? booking.guest_name ?? "Booked";
-  const compact = h < 34;
-  return (
-    <div className="absolute inset-x-1 overflow-hidden rounded-[5px] border-l-[3px] px-1.5"
-      style={{ top: top + 1, height: h - 2, background: style.bg, borderColor: style.bar, color: style.ink }}
-      title={`${fmt(start)}–${fmt(end)} · ${name} · ${service}`}>
-      {compact ? (
-        <div className="truncate pt-px text-[10.5px] leading-[16px]"><span className="font-semibold">{name.split(" ")[0]}</span> · {service}</div>
-      ) : (
-        <div className="pt-1 leading-tight">
-          <div className="tnum text-[10.5px] opacity-70">{fmt(start)}–{fmt(end)}</div>
-          <div className="truncate text-[12px] font-semibold">{name}</div>
-          {h >= 52 && <div className="truncate text-[11px] opacity-80">{service}</div>}
-        </div>
-      )}
-    </div>
-  );
+/** Merge back-to-back appointments (gaps under 20 min) into one grey run. Walk-ins stay separate. */
+function bookedRuns(items: { a: number; b: number; walkIn: boolean }[]) {
+  const sorted = items.sort((x, y) => x.a - y.a);
+  const runs: { a: number; b: number; walkIn: boolean }[] = [];
+  for (const it of sorted) {
+    const last = runs[runs.length - 1];
+    if (last && !it.walkIn && !last.walkIn && it.a - last.b < 20) last.b = Math.max(last.b, it.b);
+    else runs.push({ ...it });
+  }
+  return runs;
 }
 
-function OpenTime({ slot, flash, top, h, minutes, start }: {
-  slot: Slot; flash: boolean; top: number; h: number; minutes: number; start: number;
-}) {
-  const box = "absolute inset-x-1 overflow-hidden rounded-[5px] px-1.5 pt-1 text-[11px] leading-tight transition-colors duration-500";
-  const pos = { top: top + 1, height: h - 2 };
+function OpenTime({ slot, flash, top, minutes, pxPerMin }: { slot: Slot; flash: boolean; top: number; minutes: number; pxPerMin: number }) {
+  const h = minutes * pxPerMin;
+  const pos = { top: top + 1.5, height: h - 3 };
+  const box = "absolute inset-x-1.5 overflow-hidden rounded-md px-2 pt-1.5 leading-tight transition-colors duration-500";
+  const big = minutes >= 40;
   const dur = minutes >= 60 ? `${minutes % 60 ? (minutes / 60).toFixed(1) : minutes / 60} h` : `${minutes} min`;
   switch (slot.state) {
     case "paid":
       return (
-        <div className={`${box} border-l-[3px] border-sold bg-sold-soft text-sold-ink ${flash ? "sold-flash" : ""}`} style={pos}>
-          <div className="tnum text-[10.5px] opacity-70">{fmt(start)} · Paid</div>
-          <div className="truncate text-[12px] font-semibold">{slot.sold_to}</div>
-          {h >= 52 && <div className="tnum truncate">{slot.sold_price ? rupees(slot.sold_price) : ""} · via agent</div>}
+        <div className={`${box} bg-sold text-[#3d2c00] shadow-sm ${flash ? "sold-flash" : ""}`} style={pos}>
+          <div className="truncate text-[13px] font-semibold">{slot.sold_to?.split(" ")[0]}</div>
+          {h >= 34 && <div className="tnum truncate text-[11.5px] font-medium opacity-80">{slot.sold_price ? rupees(slot.sold_price) : ""} paid</div>}
         </div>
       );
     case "held":
-      return (
-        <div className={`${box} hatch border border-dashed border-line-2 text-muted`} style={pos}>
-          Held for walk-ins
-        </div>
-      );
+      return <div className={`${box} hatch text-[11px] text-muted`} style={pos}>{big && "Kept for walk-ins"}</div>;
     case "offered":
-      return (
-        <div className={`${box} border border-dashed border-accent/70 bg-accent-soft/60 text-accent`} style={pos}>
-          <span className="font-medium">Offered</span> · {dur}
-        </div>
-      );
     case "released":
       return (
-        <div className={`${box} border border-accent/40 bg-surface text-accent/80`} style={pos}>
-          Released · {dur}
+        <div className={`${box} border border-dashed border-accent/60 bg-accent-soft/70 text-[11px] font-medium text-accent`} style={pos}>
+          {big && "Offered"}
         </div>
       );
     default:
       return (
-        <div className={`${box} border border-dashed border-line-2 bg-surface text-faint`} style={pos}>
-          Open · {dur}
+        <div className={`${box} border border-dashed border-line-2 bg-surface text-[11px] text-muted`} style={pos}>
+          {big && <>Empty · {dur}</>}
         </div>
       );
   }
@@ -196,19 +156,14 @@ function useJustSold(slots: Slot[]) {
 }
 
 export function CalendarLegend() {
-  const sw = (style: React.CSSProperties, cls = "") => <span className={`inline-block h-3 w-4 rounded-[3px] ${cls}`} style={style} />;
+  const sw = (cls: string) => <span className={`inline-block h-3 w-4 rounded-[3px] ${cls}`} />;
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12px] text-muted">
-      {Object.entries({ Haircut: "svc_haircut", "Hair spa": "svc_spa", "Beard trim": "svc_beard", Colour: "svc_colour" }).map(([label, id]) => (
-        <span key={id} className="flex items-center gap-1.5">
-          {sw({ background: SERVICE_STYLE[id].bg, borderLeft: `3px solid ${SERVICE_STYLE[id].bar}` })}{label}
-        </span>
-      ))}
-      <span className="mx-1 h-3 w-px bg-line-2" />
-      <span className="flex items-center gap-1.5">{sw({}, "border border-dashed border-line-2 bg-surface")}Open</span>
-      <span className="flex items-center gap-1.5">{sw({}, "hatch border border-dashed border-line-2")}Held for walk-ins</span>
-      <span className="flex items-center gap-1.5">{sw({}, "border border-dashed border-accent/70 bg-accent-soft")}Offered</span>
-      <span className="flex items-center gap-1.5">{sw({}, "border-l-[3px] border-sold bg-sold-soft")}Sold by agent</span>
+      <span className="flex items-center gap-1.5">{sw("bg-[#eef0f3]")}Booked</span>
+      <span className="flex items-center gap-1.5">{sw("border border-dashed border-line-2 bg-surface")}Empty</span>
+      <span className="flex items-center gap-1.5">{sw("hatch")}Kept for walk-ins</span>
+      <span className="flex items-center gap-1.5">{sw("border border-dashed border-accent/60 bg-accent-soft")}Offered</span>
+      <span className="flex items-center gap-1.5">{sw("bg-sold")}Sold by the agent</span>
     </div>
   );
 }

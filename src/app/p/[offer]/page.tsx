@@ -71,10 +71,12 @@ function PayView({ offerId }: { offerId: string }) {
       prefill: { name: order.customer, contact: order.phone },
       notes: { offer_id: offerId },
       theme: { color: "#0c2651" },
+      // The bank-funded price goes to card checkout. Razorpay test mode has no HDFC test card, so the
+      // issuer isn't restricted here; in production a Razorpay Offer checks the card is HDFC.
       ...(bank ? {
         config: {
           display: {
-            blocks: { hdfc: { name: "Pay with an HDFC Bank card", instruments: [{ method: "card", issuers: ["HDFC"] }] } },
+            blocks: { hdfc: { name: "Pay with your HDFC Bank card", instruments: [{ method: "card" }] } },
             sequence: ["block.hdfc"],
             preferences: { show_default_blocks: false },
           },
@@ -164,6 +166,9 @@ function PayView({ offerId }: { offerId: string }) {
               <div className="flex items-center justify-center gap-1 text-[12px] text-[#667085]">
                 <Lock className="h-3 w-3" /> Payments secured by <span className="font-semibold text-[#344054]">Razorpay</span>
               </div>
+              <p className="rounded-lg bg-[#fffaeb] px-3 py-2 text-center text-[11.5px] leading-snug text-[#93370d]">
+                Test mode, no real money: pick Netbanking and tap <b>Success</b>, or use UPI ID <b>success@razorpay</b>.
+              </p>
             </div>
           </div>
         )}

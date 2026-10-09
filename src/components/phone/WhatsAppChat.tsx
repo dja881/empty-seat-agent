@@ -100,19 +100,18 @@ export function WhatsAppChat({ customerId, customerName }: { customerId: string;
       </div>
 
       {/* quick replies, alongside the keyboard */}
+      {/* One optional suggestion for the demo; the keyboard is the main way to reply. */}
       {lastSalon && !hasReplied && (
-        <div className="flex shrink-0 gap-2 overflow-x-auto px-3 pb-2">
-          {SUGGESTIONS.map((s) => (
-            <button key={s} onClick={() => send(s)} className="shrink-0 rounded-full border border-[#d1d7db] bg-white px-3 py-1.5 text-[12.5px] text-[#111b21] shadow-sm">
-              {s}
-            </button>
-          ))}
+        <div className="flex shrink-0 justify-end px-3 pb-1.5">
+          <button onClick={() => send(SUGGESTIONS[0])} className="max-w-[85%] truncate rounded-full bg-white/80 px-3 py-1 text-[12px] text-[#54656f] shadow-sm">
+            Suggested: {SUGGESTIONS[0]}
+          </button>
         </div>
       )}
 
       <form onSubmit={(e) => { e.preventDefault(); send(text); }} className="flex shrink-0 items-center gap-2 px-2 pb-3 pt-1">
         <div className="flex min-w-0 flex-1 items-center gap-2 rounded-full bg-white px-4 py-2.5 shadow-sm">
-          <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Message"
+          <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Type a message"
             className="min-w-0 flex-1 bg-transparent text-[15px] text-[#111b21] outline-none placeholder:text-[#8696a0]" />
           <Paperclip className="h-5 w-5 shrink-0 text-[#54656f]" />
         </div>

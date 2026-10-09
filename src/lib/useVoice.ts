@@ -19,7 +19,7 @@ export function useVoice(onHeard: (text: string) => void) {
     setSupported(!!SR);
   }, []);
 
-  const speak = useCallback(async (text: string) => {
+  const speak = useCallback(async (text: string, onProgress?: (fraction: number) => void) => {
     try {
       const res = await fetch("/api/voice", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
       if (!res.ok) return;
@@ -29,9 +29,10 @@ export function useVoice(onHeard: (text: string) => void) {
       audio.current = a;
       setSpeaking(true);
       await new Promise<void>((resolve) => {
-        a.onended = () => resolve();
-        a.onerror = () => resolve();
-        a.play().catch(() => resolve());
+        a.ontimeupdate = () => { if (a.duration) onProgress?.(a.currentTime / a.duration); };
+        a.onended = () => { onProgress?.(1); resolve(); };
+        a.onerror = () => { onProgress?.(1); resolve(); };
+        a.play().catch(() => { onProgress?.(1); resolve(); });
       });
     } finally {
       setSpeaking(false);
