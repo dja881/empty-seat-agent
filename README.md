@@ -13,7 +13,7 @@ Demo salon: Glow Salon, Madhapur, Hyderabad. All data is synthetic.
 
 - Next.js on Vercel (screens and server routes holding secret keys)
 - Supabase: Postgres, Realtime, Storage
-- Qwen (DashScope international, OpenAI-compatible) for the three agents
+- Qwen on Cerebras (OpenAI-compatible API) for the three agents
 - Razorpay test mode: Orders API, Checkout, `payment.captured` webhook, Refunds API
 - ElevenLabs for the agent's voice; browser speech recognition for the merchant
 
@@ -38,7 +38,7 @@ npm run dev
 | Item | Used for | Real or simulated |
 |---|---|---|
 | Razorpay test mode | Offer payments, locking slots, refunds on double payment | Real, test mode |
-| Qwen API | Planner agent, salon's customer agent, customer's own agent | Real |
+| Qwen on Cerebras | Planner agent, salon's customer agent, customer's own agent | Real |
 | Supabase | Data, live updates, cached voice clips | Real |
 | Vercel | Hosting and server routes | Real |
 | ElevenLabs | Agent's voice | Real |
