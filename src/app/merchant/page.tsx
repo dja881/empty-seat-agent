@@ -39,7 +39,7 @@ function Merchant() {
   const router = useRouter();
   const search = useSearchParams();
   const [trigger, setTrigger] = useState(0);
-  const { data, error, reload } = useBoardData();
+  const { data, error } = useBoardData();
   const events = useEvents();
   const [plan, setPlan] = useState<Plan | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
