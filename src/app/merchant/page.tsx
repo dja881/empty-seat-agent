@@ -2,7 +2,8 @@
 
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowRight, CheckCircle2, Sun } from "lucide-react";
+import { ArrowRight, CheckCircle2, RotateCcw, Sun } from "lucide-react";
+import { VoiceToggle } from "@/components/agent/VoiceToggle";
 import { AppShell } from "@/components/shell/AppShell";
 import { Calendar, CalendarLegend } from "@/components/Calendar";
 import { DayStats } from "@/components/DayStats";
@@ -57,11 +58,13 @@ function Merchant() {
   const view: Stage = asked && order.indexOf(asked) <= order.indexOf(stage) && asked !== "idle" ? asked : stage === "done" ? "live" : stage;
   const go = (v: Stage) => router.replace(v === stage ? "/merchant" : `/merchant?view=${v}`);
 
-  // The agent speaks the 1:30 pm footfall alert out loud when it happens.
+  // The agent speaks the 1:30 pm footfall alert when it happens while you're watching,
+  // never again on a reload or when you come back to this screen.
   const spoken = useRef(new Set<string>());
+  const mountedAt = useRef(Date.now());
   useEffect(() => {
     const alert = events.find((e) => e.type === "footfall_alert");
-    if (alert && !spoken.current.has(alert.id) && stage === "live") {
+    if (alert && new Date(alert.created_at).getTime() > mountedAt.current - 2000 && !spoken.current.has(alert.id) && stage === "live") {
       spoken.current.add(alert.id);
       chat.say(String(alert.payload.text));
     }
@@ -97,7 +100,17 @@ function Merchant() {
 
   return (
     <AppShell title="Empty Seat Agent" crumbs={["Agents"]}
-      actions={data && <div className="flex items-center gap-4"><div className="hidden md:block"><DayStats data={data} /></div><DemoBar demo={data.demo} /></div>}>
+      actions={data && (
+        <div className="flex items-center gap-3">
+          <div className="hidden md:block"><DayStats data={data} /></div>
+          <VoiceToggle />
+          <button onClick={async () => { await post("/api/demo/reset", {}); window.location.href = "/merchant"; }}
+            className="flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-[13px] font-medium text-ink-2 hover:bg-background">
+            <RotateCcw className="h-3.5 w-3.5" /> Restart demo
+          </button>
+          <DemoBar demo={data.demo} />
+        </div>
+      )}>
       {error && <p className="rounded-lg bg-red-50 p-3 text-sm text-danger">Could not load today: {error}</p>}
       {!data && !error && <p className="text-muted">Loading today&apos;s chairs…</p>}
       {data && (

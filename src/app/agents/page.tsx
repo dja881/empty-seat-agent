@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Lock } from "lucide-react";
 import { AppShell } from "@/components/shell/AppShell";
 
@@ -16,7 +16,6 @@ export default function AgentsPage() {
   const [result, setResult] = useState<Result | null>(null);
   const [shown, setShown] = useState(0);
   const [running, setRunning] = useState(false);
-  const started = useRef(false);
 
   async function run(customerMax: number) {
     setRunning(true);
@@ -31,7 +30,6 @@ export default function AgentsPage() {
     }
     setRunning(false);
   }
-  useEffect(() => { if (!started.current) { started.current = true; run(380); } }, []);
 
   const done = result && shown >= result.rounds.length;
   const salonPrices = result?.rounds.slice(0, shown).map((r) => r.salon.price).filter((p): p is number => !!p) ?? [];
@@ -47,7 +45,7 @@ export default function AgentsPage() {
             <option value={330}>₹330 (no overlap)</option>
           </select>
           <button onClick={() => run(max)} disabled={running} className="rounded-lg bg-accent px-3 py-1.5 font-semibold text-white disabled:opacity-60">
-            {running ? "Negotiating…" : "Run again"}
+            {running ? "Negotiating…" : result ? "Run again" : "Start negotiation"}
           </button>
         </div>
       }>
@@ -79,7 +77,7 @@ export default function AgentsPage() {
             </div>
           </div>
           <div className="mt-3 space-y-2.5">
-            {!result && <p className="text-center text-[13px] text-muted">Connecting the two agents…</p>}
+            {!result && <p className="py-6 text-center text-[13px] text-muted">{running ? "Connecting the two agents…" : "Press Start negotiation to watch Kavya's assistant book tomorrow's slot."}</p>}
             {result?.rounds.slice(0, shown).map((r) => (
               <div key={r.n} className="grid grid-cols-[1fr_32px_1fr] items-start gap-3">
                 <div className="flex justify-end"><p className="max-w-[90%] rounded-lg rounded-tr-none bg-background px-3 py-2 text-[13px] text-ink">{r.customer.text}</p></div>

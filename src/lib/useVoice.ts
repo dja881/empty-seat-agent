@@ -20,6 +20,10 @@ export function useVoice(onHeard: (text: string) => void) {
   }, []);
 
   const speak = useCallback(async (text: string, onProgress?: (fraction: number) => void) => {
+    // Voice off: show the words, skip the audio (and the ElevenLabs call).
+    let muted = false;
+    try { muted = localStorage.getItem("voice-muted") === "1"; } catch {}
+    if (muted) { onProgress?.(1); return; }
     try {
       const res = await fetch("/api/voice", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
       if (!res.ok) return;
