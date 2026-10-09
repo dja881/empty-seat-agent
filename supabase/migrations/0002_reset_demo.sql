@@ -70,7 +70,7 @@ begin
 
   insert into customers (id, merchant_id, name, phone, distance_km, last_visit_at, usual_gap_days, usual_time_band,
     usual_service_id, avg_spend, past_offer_response, card_issuer, is_regular, opted_out) values
-    ('c_riya','glow','Riya Reddy','+91 98480 10000',1.2,('2026-10-13 12:00+05:30'::timestamptz - interval '42 days'),35,'afternoon','svc_haircut',520,0.6,'HDFC',false,false),
+    ('c_riya','glow','Riya Reddy','+91 98480 10000',1.2,('2026-10-13 12:00+05:30'::timestamptz - interval '42 days'),35,'afternoon','svc_haircut',520,0.75,'HDFC',false,false),
     ('c_aditya','glow','Aditya Rao','+91 98480 10137',0.8,('2026-10-13 12:00+05:30'::timestamptz - interval '38 days'),30,'afternoon','svc_haircut',480,0.5,'ICICI',false,false),
     ('c_sneha_k','glow','Sneha Kulkarni','+91 98480 10274',2.1,('2026-10-13 12:00+05:30'::timestamptz - interval '50 days'),42,'afternoon','svc_spa',1250,0.45,'HDFC',false,false),
     ('c_imran','glow','Imran Shaikh','+91 98480 10411',1.5,('2026-10-13 12:00+05:30'::timestamptz - interval '27 days'),21,'afternoon','svc_beard',260,0.55,null,false,false),

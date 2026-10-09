@@ -66,10 +66,10 @@ where h01('w' || day || hr || k) < lam / 6;
 -- The demo day (Tue 13 Oct) runs about 20% below normal all day, with a ~30% dip at 1 pm;
 -- nearby salons run about 25% below (market-wide slowness).
 with cats(category, merchants, curve) as (values
-  ('cafe',       14, array[6,9,8,6,5,7,8,7,6,5,5,6,5,3,2]),
+  ('cafe',       14, array[6,9,8,6,5,7,8,7,6,5,5,6,5,3,2]::numeric[]),
   ('restaurant', 16, array[1,2,3,4,9,10,5,3,3,4,8,11,10,6,3]),
   ('retail',     12, array[0,1,2,4,5,6,6,6,7,7,8,8,7,4,1]),
-  ('salon',      10, array[0,0,2,3,3,3,3,2,2,3,3,3,2,1,0])
+  ('salon',      10, array[1,1.5,2,3,3,3,3,2,2,3,3,3,2,1,0]::numeric[])  -- early prepaid bookings and product sales from 8 am
 ),
 days as (
   select d::date as day, extract(isodow from d)::int as dow

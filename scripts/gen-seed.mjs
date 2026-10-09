@@ -28,7 +28,7 @@ const byDuration = Object.fromEntries(services.map((s) => [s.duration, s]));
 // type: target (due, nearby, occasional), regular, vip, opted_out, far, lapsed, recent
 const C = [
   // Due occasional customers: the agent's real audience
-  ["c_riya", "Riya Reddy", "target", 1.2, 42, 35, "afternoon", "svc_haircut", 520, 0.6, "HDFC"],
+  ["c_riya", "Riya Reddy", "target", 1.2, 42, 35, "afternoon", "svc_haircut", 520, 0.75, "HDFC"],
   ["c_aditya", "Aditya Rao", "target", 0.8, 38, 30, "afternoon", "svc_haircut", 480, 0.5, "ICICI"],
   ["c_sneha_k", "Sneha Kulkarni", "target", 2.1, 50, 42, "afternoon", "svc_spa", 1250, 0.45, "HDFC"],
   ["c_imran", "Imran Shaikh", "target", 1.5, 27, 21, "afternoon", "svc_beard", 260, 0.55, null],
