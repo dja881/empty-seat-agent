@@ -26,11 +26,14 @@ export async function POST(req: Request) {
 
   let plan = await proposePlan(day, signals);
   let reply = "";
+  const alreadyApproved = day.demo.plan?.status === "approved";
 
   if (op === "edit") {
     const { edit, next } = await interpretEdit(day, plan, String(text ?? ""), signals);
     plan = await proposePlan(day, signals, next);
-    if (edit.approve) {
+    if (edit.approve && alreadyApproved) {
+      reply = "Already running. I'll keep you posted.";
+    } else if (edit.approve) {
       await applyPlan(day, signals, plan);
       plan.status = "approved";
       reply = `Starting now. First messages go out at ${timeLabel(parseHHMM(plan.firstWaveAt))} from your WhatsApp number, signed by ${day.merchant.front_desk_name}.`;
@@ -45,6 +48,8 @@ export async function POST(req: Request) {
       reply = `Done. ${parts.join(", ")}. Shall I start?`;
     } else reply = edit.reply;
     plan.history = [...plan.history, { from: "owner", text: String(text) }, { from: "agent", text: reply }];
+  } else if (op === "approve" && alreadyApproved) {
+    return NextResponse.json({ plan: day.demo.plan, reply: "", signals: summary(signals) });
   } else if (op === "approve") {
     await applyPlan(day, signals, plan);
     plan.status = "approved";

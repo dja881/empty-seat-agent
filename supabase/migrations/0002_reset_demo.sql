@@ -37,8 +37,8 @@ returns void language plpgsql security definer set search_path = public as $$
 declare
   d date := '2026-10-13';
 begin
-  delete from payments;
-  delete from offers;
+  delete from payments where true;
+  delete from offers where true;
   delete from events where merchant_id = 'glow';
   delete from slots where merchant_id = 'glow';
   delete from demo_state where merchant_id = 'glow';

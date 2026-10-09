@@ -47,6 +47,23 @@ export interface Slot {
   sold_price: number | null;
 }
 
+export interface Plan {
+  status: "proposed" | "approved" | "skipped" | "paused";
+  maxDiscount: number;
+  releasedUnits: number;
+  heldUnits: number;
+  openUnits: number;
+  expectedWalkIns: number;
+  expectedRevenue: number;
+  footfallPct: number;
+  salonsPct: number;
+  heldHours: string;
+  excludedServices: string[];
+  keepOpen: string[];
+  firstWaveAt: string;
+  history: { from: string; text: string }[];
+}
+
 export interface DemoState {
   merchant_id: string;
   demo_date: string;
@@ -54,4 +71,13 @@ export interface DemoState {
   mode: "demo" | "live";
   scripted: boolean;
   sim_step: number;
+  plan: Plan | null;
+}
+
+export interface AgentEvent {
+  id: string;
+  type: string;
+  payload: Record<string, unknown>;
+  created_at: string;
+  clock_at: string | null;
 }
