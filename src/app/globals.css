@@ -1,47 +1,59 @@
 @import "tailwindcss";
 
-/* Razorpay-style palette. Light only: the merchant dashboard is recorded for the video. */
+/* Merchant dashboard tokens. Neutral surfaces, one blue accent, service colours on the
+   calendar the way salon software colours appointments, amber for agent-sold time. */
 :root {
-  --background: #f5f7fb;
-  --foreground: #0c2651;
+  --background: #f6f7f9;
+  --foreground: #101828;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-rzp: #2b83ea;
-  --color-rzp-dark: #1a5fc1;
-  --color-navy: #0c2651;
-  --color-ink: #33475b;
-  --color-muted: #7b8ba3;
-  --color-line: #e3e8f0;
-  --color-booked: #d5dbe5;
-  --color-gold: #f3b61f;
-  --color-gold-soft: #fff4d1;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: #ffffff;
+  --color-ink: #101828;
+  --color-ink-2: #344054;
+  --color-muted: #667085;
+  --color-faint: #98a2b3;
+  --color-line: #eaecf0;
+  --color-line-2: #d0d5dd;
+  --color-accent: #1f5eff;
+  --color-accent-soft: #eef3ff;
+  --color-success: #067647;
+  --color-success-soft: #ecfdf3;
+  --color-warn: #b54708;
+  --color-warn-soft: #fffaeb;
+  --color-danger: #d92d20;
+  --color-sold: #f5b800;
+  --color-sold-soft: #fff6d6;
+  --color-sold-ink: #6b4e00;
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+  font-feature-settings: "cv11", "ss01";
 }
 
-/* A sold block lights up gold with a brief glow. */
-@keyframes sold-glow {
-  0% { box-shadow: 0 0 0 0 rgba(243, 182, 31, 0.9); transform: scale(1); }
-  40% { box-shadow: 0 0 0 10px rgba(243, 182, 31, 0); transform: scale(1.04); }
-  100% { box-shadow: 0 0 0 0 rgba(243, 182, 31, 0); transform: scale(1); }
-}
-.sold-glow { animation: sold-glow 1.2s ease-out; }
+.tnum { font-variant-numeric: tabular-nums; }
 
-@keyframes offered-pulse {
+/* Agent-sold block: one warm flash when payment lands. */
+@keyframes sold-flash {
+  0% { box-shadow: 0 0 0 0 rgba(245, 184, 0, 0.75); filter: brightness(1.08); }
+  60% { box-shadow: 0 0 0 8px rgba(245, 184, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(245, 184, 0, 0); filter: none; }
+}
+.sold-flash { animation: sold-flash 1.4s ease-out; }
+
+@keyframes live-dot {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
+  50% { opacity: 0.3; }
 }
-.offered-pulse { animation: offered-pulse 1.6s ease-in-out infinite; }
+.live-dot { animation: live-dot 1.8s ease-in-out infinite; }
 
-.held-hatch {
+.hatch {
   background-image: repeating-linear-gradient(
-    -45deg, rgba(123, 139, 163, 0.14) 0 6px, transparent 6px 12px);
+    135deg, rgba(102, 112, 133, 0.10) 0 5px, transparent 5px 10px);
 }

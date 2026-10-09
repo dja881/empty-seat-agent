@@ -1,23 +1,23 @@
 "use client";
 
-import { BoardHeader } from "@/components/BoardHeader";
-import { BoardLegend, ChairBoard } from "@/components/ChairBoard";
+import { AppShell } from "@/components/shell/AppShell";
+import { Calendar, CalendarLegend } from "@/components/Calendar";
+import { DayStats } from "@/components/DayStats";
 import { useBoardData } from "@/lib/useBoardData";
 
-/** Standalone chair board, used to get the visual anchor right before the rest. */
+/** Plain day calendar: today's chairs without the agent panel. */
 export default function BoardPage() {
   const { data, error } = useBoardData();
   return (
-    <main className="mx-auto max-w-6xl space-y-5 px-4 py-6 sm:px-6">
-      {error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">Could not load the board: {error}</p>}
-      {!data && !error && <p className="text-sm text-muted">Loading today&apos;s chairs…</p>}
+    <AppShell title="Today's chairs" crumbs={["Calendar"]} actions={data && <DayStats data={data} />}>
+      {error && <p className="rounded-lg bg-red-50 p-3 text-sm text-danger">Could not load the calendar: {error}</p>}
+      {!data && !error && <p className="text-muted">Loading today&apos;s chairs…</p>}
       {data && (
-        <>
-          <BoardHeader data={data} />
-          <ChairBoard data={data} />
-          <BoardLegend />
-        </>
+        <div className="space-y-3">
+          <Calendar data={data} />
+          <CalendarLegend />
+        </div>
       )}
-    </main>
+    </AppShell>
   );
 }
