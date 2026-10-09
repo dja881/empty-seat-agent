@@ -1,26 +1,47 @@
 @import "tailwindcss";
 
+/* Razorpay-style palette. Light only: the merchant dashboard is recorded for the video. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f5f7fb;
+  --foreground: #0c2651;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-rzp: #2b83ea;
+  --color-rzp-dark: #1a5fc1;
+  --color-navy: #0c2651;
+  --color-ink: #33475b;
+  --color-muted: #7b8ba3;
+  --color-line: #e3e8f0;
+  --color-booked: #d5dbe5;
+  --color-gold: #f3b61f;
+  --color-gold-soft: #fff4d1;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* A sold block lights up gold with a brief glow. */
+@keyframes sold-glow {
+  0% { box-shadow: 0 0 0 0 rgba(243, 182, 31, 0.9); transform: scale(1); }
+  40% { box-shadow: 0 0 0 10px rgba(243, 182, 31, 0); transform: scale(1.04); }
+  100% { box-shadow: 0 0 0 0 rgba(243, 182, 31, 0); transform: scale(1); }
+}
+.sold-glow { animation: sold-glow 1.2s ease-out; }
+
+@keyframes offered-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.offered-pulse { animation: offered-pulse 1.6s ease-in-out infinite; }
+
+.held-hatch {
+  background-image: repeating-linear-gradient(
+    -45deg, rgba(123, 139, 163, 0.14) 0 6px, transparent 6px 12px);
 }
