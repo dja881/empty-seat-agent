@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { AppShell } from "@/components/shell/AppShell";
 import { Calendar } from "@/components/Calendar";
 import { DemoBar } from "@/components/agent/DemoBar";
+import { FlowBar } from "@/components/agent/FlowBar";
+import { istMinutes } from "@/lib/time";
 import { useBoardData } from "@/lib/useBoardData";
 import { rupees } from "@/lib/time";
 
@@ -24,6 +26,12 @@ export default function SummaryPage() {
   return (
     <AppShell title="Daily report" crumbs={["Agents", "Empty Seat Agent", "Tue, 13 Oct"]}
       actions={data && <DemoBar demo={data.demo} />}>
+      {data && (
+        <div className="mb-4">
+          <FlowBar stage={istMinutes(data.demo.clock_at) >= 20 * 60 ? "done" : "live"} view="done" busy={null}
+            next={istMinutes(data.demo.clock_at) >= 20 * 60 ? null : { label: "Back to live sales", run: () => { window.location.href = "/merchant"; } }} />
+        </div>
+      )}
       {!r && <p className="text-muted">Adding up today…</p>}
       {r && (
         <div className="space-y-4">

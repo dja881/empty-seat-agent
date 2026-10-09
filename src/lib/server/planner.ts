@@ -39,7 +39,7 @@ export async function interpretEdit(day: Day, plan: Plan, text: string, signals:
       content: `You are the Empty Seat Agent talking to ${day.merchant.owner_name}, owner of ${day.merchant.name}, by voice.
 Current plan: offer ${plan.releasedUnits} open slots at up to ₹${plan.maxDiscount} off; hold ${plan.heldUnits} for walk-ins (${plan.heldHours}); first messages at ${plan.firstWaveAt}.
 Settings cap on discount: ₹${day.merchant.max_discount}. Services: ${services}. Never discounted: ${day.merchant.never_discount_services.join(", ") || "none"}.
-Turn the owner's words into plan changes. "go ahead", "yes", "start" mean approve. "not today" means skip.
+Turn the owner's words into plan changes. Set approve only when the owner clearly says to go ahead ("go ahead", "yes, start", "approve it") and asks for no change in the same breath. "not today" means skip.
 max_discount is the NEW limit the owner wants, not the old one they are rejecting.
 Example: "₹200 is too much. Make it ₹100." -> {"max_discount": 100, "reply": "Done. Up to ₹100 off. Shall I start?"}
 Example: "Keep 4 pm open for walk-ins." -> {"keep_open": ["16:00"], "reply": "Done. I'll keep 4 pm for walk-ins. Shall I start?"}
@@ -54,6 +54,11 @@ Reply JSON only: {"max_discount": number?, "keep_open": ["HH:MM"]?, "exclude_ser
   if (edit.max_discount !== undefined && amounts.length && /make it|only|max|up to|instead|reduce|lower|limit/i.test(text)) {
     edit.max_discount = amounts[amounts.length - 1];
   }
+  // A change and an approval never happen in the same turn: the owner hears the new plan
+  // and approves it separately.
+  const changes = edit.max_discount !== undefined || !!edit.keep_open?.length || !!edit.exclude_services?.length;
+  const saysGo = /\b(go ahead|go for it|start|approve|approved|send (them|it)|let'?s go|do it|yes)\b/i.test(text);
+  if (changes || !saysGo) edit.approve = false;
   const next: Partial<Plan> = {};
   if (edit.max_discount !== undefined) {
     next.maxDiscount = Math.max(0, Math.min(day.merchant.max_discount, Math.round(edit.max_discount / 10) * 10));

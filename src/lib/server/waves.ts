@@ -72,3 +72,25 @@ export async function setClock(hhmm: string) {
   must(await db.from("demo_state").update({ clock_at: clock, updated_at: new Date().toISOString() })
     .eq("merchant_id", MERCHANT_ID), "clock");
 }
+
+/**
+ * Send one customer's offer from the wave preview (the dashboard sends them one by one so the
+ * owner can watch them go out). Re-checks the slot and the price limits before sending.
+ */
+export async function sendOne(wave: number, row: { customerId: string; chair: number; start: number; serviceId: string; price: number }) {
+  const day = await loadDay();
+  const c = must(await db.from("customers").select("*").eq("id", row.customerId).single(), "customer") as CustomerRow;
+  const service = day.services.find((s) => s.id === row.serviceId) ?? day.services.find((s) => s.id === c.usual_service_id)!;
+  const { enforcePrice } = await import("./pricing");
+  const { price } = enforcePrice(day, service, row.price);
+  const { offer } = await createOffer(day, { customer: c, service, chair: row.chair, start: row.start, end: row.start + service.duration_min, price, wave });
+  await postMessage(day, c.id, "salon", openerText(day, c, service, row.start, price), {
+    template: "slot_offer_v2", links: [{ offer_id: offer.id, label: `Pay ₹${price}` }], call_button: true,
+  });
+  return offer.id;
+}
+
+export async function finishWave(wave: number, count: number) {
+  await refreshOffered();
+  await logEvent("offer_sent", { wave, count });
+}

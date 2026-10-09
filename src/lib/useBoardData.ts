@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MERCHANT_ID, supabase } from "./supabase";
 import { istDayRange } from "./time";
-import type { Booking, DemoState, Merchant, Service, Slot } from "./types";
+import type { Booking, DemoState, Merchant, OpenOffer, Service, Slot } from "./types";
 
 export interface BoardData {
   merchant: Merchant;
@@ -11,6 +11,7 @@ export interface BoardData {
   demo: DemoState;
   bookings: Booking[];
   slots: Slot[];
+  offers: OpenOffer[];
 }
 
 /** Loads today's board and keeps it live through Supabase Realtime. */
@@ -30,18 +31,21 @@ export function useBoardData() {
       return;
     }
     const { from, to } = istDayRange(d.data.demo_date);
-    const [b, sl] = await Promise.all([
+    const [b, sl, of] = await Promise.all([
       supabase.from("bookings").select("*, customers(name)").eq("merchant_id", MERCHANT_ID)
         .gte("start_at", from).lt("start_at", to).order("start_at"),
       supabase.from("slots").select("*").eq("merchant_id", MERCHANT_ID)
         .gte("start_at", from).lt("start_at", to).order("start_at"),
+      // Offers a customer is actively discussing (links sent from a chat), shown by name on the board.
+      supabase.from("offers").select("id, customer_id, guest_name, chair, start_at, end_at, status, customers(name)")
+        .eq("status", "link_sent").gte("start_at", from).lt("start_at", to),
     ]);
     if (b.error || sl.error) {
       setError((b.error ?? sl.error)!.message);
       return;
     }
     setError(null);
-    setData({ merchant: m.data, services: s.data, demo: d.data, bookings: b.data, slots: sl.data });
+    setData({ merchant: m.data, services: s.data, demo: d.data, bookings: b.data, slots: sl.data, offers: (of.data ?? []) as unknown as OpenOffer[] });
   }, []);
 
   useEffect(() => {
@@ -57,6 +61,7 @@ export function useBoardData() {
       .on("postgres_changes", { event: "*", schema: "public", table: "bookings" }, reload)
       .on("postgres_changes", { event: "*", schema: "public", table: "demo_state" }, reload)
       .on("postgres_changes", { event: "*", schema: "public", table: "merchants" }, reload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "offers" }, reload)
       .subscribe();
     return () => {
       if (timer.current) clearTimeout(timer.current);

@@ -52,6 +52,20 @@ export default function AgentsPage() {
         </div>
       }>
       <div className="space-y-4">
+        <div className="grid gap-3 md:grid-cols-3">
+          {[
+            ["1", "Kavya asks her own AI assistant", `“Book me a haircut tomorrow after 3 pm. Don't pay more than ₹${result?.customerMax ?? max}.” Only her assistant knows that limit.`],
+            ["2", "It talks to Glow Salon's agent", `The salon's agent opens at ₹${result?.opening ?? 400}. Its floor (₹${result?.floor ?? 350}) is set by Priya and checked in code. It trades a prepayment for price instead of just discounting.`],
+            ["3", "A deal only where limits overlap", "If the floor is below her maximum, they meet in between and Razorpay takes the prepayment. If not, no deal: she goes on the waitlist."],
+          ].map(([n, t, d]) => (
+            <div key={n} className="rounded-xl border border-line bg-surface p-4">
+              <div className="flex items-center gap-2 text-[13px] font-semibold text-ink">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent-soft text-[11px] text-accent">{n}</span>{t}
+              </div>
+              <p className="mt-1.5 text-[12.5px] leading-snug text-muted">{d}</p>
+            </div>
+          ))}
+        </div>
         <div className="rounded-xl border border-line bg-surface p-4">
           <div className="grid grid-cols-[1fr_32px_1fr] gap-3 border-b border-line pb-3 text-[13px]">
             <div className="text-right">

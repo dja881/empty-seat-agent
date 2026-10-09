@@ -71,14 +71,15 @@ function PayView({ offerId }: { offerId: string }) {
       prefill: { name: order.customer, contact: order.phone },
       notes: { offer_id: offerId },
       theme: { color: "#0c2651" },
-      // The bank-funded price goes to card checkout. Razorpay test mode has no HDFC test card, so the
-      // issuer isn't restricted here; in production a Razorpay Offer checks the card is HDFC.
-      ...(bank ? {
+      // Test mode: Netbanking first, because its mock bank page always completes (UPI collect and
+      // issuer-specific card offers can't be fully simulated). In production Razorpay's default order
+      // applies and a Razorpay Offer checks the HDFC card for the bank-funded price.
+      ...(order.keyId?.startsWith("rzp_test") ? {
         config: {
           display: {
-            blocks: { hdfc: { name: "Pay with your HDFC Bank card", instruments: [{ method: "card" }] } },
-            sequence: ["block.hdfc"],
-            preferences: { show_default_blocks: false },
+            blocks: { banks: { name: "Netbanking (fastest in test mode)", instruments: [{ method: "netbanking" }] } },
+            sequence: ["block.banks"],
+            preferences: { show_default_blocks: true },
           },
         },
       } : {}),
@@ -167,7 +168,7 @@ function PayView({ offerId }: { offerId: string }) {
                 <Lock className="h-3 w-3" /> Payments secured by <span className="font-semibold text-[#344054]">Razorpay</span>
               </div>
               <p className="rounded-lg bg-[#fffaeb] px-3 py-2 text-center text-[11.5px] leading-snug text-[#93370d]">
-                Test mode, no real money: pick Netbanking and tap <b>Success</b>, or use UPI ID <b>success@razorpay</b>.
+                Test mode, no real money: choose <b>Netbanking</b>, any bank, then tap <b>Success</b>.
               </p>
             </div>
           </div>

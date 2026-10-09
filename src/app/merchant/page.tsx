@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowRight, Check, CheckCircle2, Sun } from "lucide-react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowRight, CheckCircle2, Sun } from "lucide-react";
 import { AppShell } from "@/components/shell/AppShell";
 import { Calendar, CalendarLegend } from "@/components/Calendar";
 import { DayStats } from "@/components/DayStats";
@@ -9,6 +10,7 @@ import { DemoBar } from "@/components/agent/DemoBar";
 import { AgentPanel, AskBar } from "@/components/agent/AgentPanel";
 import { AgentOrb } from "@/components/agent/AgentOrb";
 import { WaveView } from "@/components/agent/WaveView";
+import { FlowBar, type Stage } from "@/components/agent/FlowBar";
 import { ActivityFeed } from "@/components/agent/ActivityFeed";
 import { LivePhone } from "@/components/agent/LivePhone";
 import { useBoardData } from "@/lib/useBoardData";
@@ -19,7 +21,6 @@ import { emptySlotCount } from "@/lib/slots";
 import { istMinutes, rupees } from "@/lib/time";
 import type { AgentEvent, Plan } from "@/lib/types";
 
-type Stage = "idle" | "plan" | "customers" | "live" | "done";
 type Step = { to: string; simulate?: ("sale" | "walk_in" | "call_me")[] };
 
 const MIDDAY: Step[] = [{ to: "11:50", simulate: ["sale"] }, { to: "12:20", simulate: ["sale"] }, { to: "12:50", simulate: ["sale"] }, { to: "13:30" }];
@@ -29,8 +30,15 @@ const AFTERNOON: Step[] = [
 ];
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-/** One guided page: morning plan → customers → live → day report, with one Next button. */
 export default function MerchantPage() {
+  return <Suspense><Merchant /></Suspense>;
+}
+
+/** One guided page: morning plan → customers → live → day report, with one Next button. */
+function Merchant() {
+  const router = useRouter();
+  const search = useSearchParams();
+  const [trigger, setTrigger] = useState(0);
   const { data, error, reload } = useBoardData();
   const events = useEvents();
   const [plan, setPlan] = useState<Plan | null>(null);
@@ -43,6 +51,11 @@ export default function MerchantPage() {
   const waveSent = events.some((e) => e.type === "offer_sent" && e.payload.wave === 1);
   const now = data ? istMinutes(data.demo.clock_at) : 0;
   const stage: Stage = !plan ? "idle" : plan.status !== "approved" && !waveSent ? "plan" : !waveSent ? "customers" : now >= 20 * 60 ? "done" : "live";
+  // You can look back at any step you've reached; the day itself only moves forward.
+  const asked = search.get("view") as Stage | null;
+  const order: Stage[] = ["idle", "plan", "customers", "live", "done"];
+  const view: Stage = asked && order.indexOf(asked) <= order.indexOf(stage) && asked !== "idle" ? asked : stage === "done" ? "live" : stage;
+  const go = (v: Stage) => router.replace(v === stage ? "/merchant" : `/merchant?view=${v}`);
 
   // The agent speaks the 1:30 pm footfall alert out loud when it happens.
   const spoken = useRef(new Set<string>());
@@ -70,9 +83,11 @@ export default function MerchantPage() {
     if (!data) return null;
     if (stage === "idle") return { label: "Start my day", run: () => chat.wake() };
     if (stage === "plan") return { label: "Approve plan", run: () => chat.approve() };
+    const labels: Record<Stage, string> = { idle: "morning plan", plan: "morning plan", customers: "customers", live: "live sales", done: "live sales" };
+    if (view !== stage && !(stage === "done" && view === "live")) return { label: `Back to ${labels[stage]}`, run: () => go(stage) };
     if (stage === "customers") return {
       label: data.demo.mode === "demo" ? "Send offers at 11:30 am" : "Send offers now",
-      run: async () => { setBusy("Sending offers…"); await post("/api/agent/wave", { wave: 1, clock: data.demo.mode === "demo" ? "11:30" : undefined }); setBusy(null); },
+      run: () => setTrigger((t) => t + 1),
     };
     if (stage === "live" && now < 13 * 60 + 30) return { label: "Skip to 1:30 pm", run: () => runSteps("Moving to 1:30 pm…", MIDDAY, 1200) };
     if (stage === "live" && now < 18 * 60) return { label: "Fast-forward to 6 pm", run: () => runSteps("Fast-forwarding…", AFTERNOON, 900) };
@@ -87,9 +102,13 @@ export default function MerchantPage() {
       {!data && !error && <p className="text-muted">Loading today&apos;s chairs…</p>}
       {data && (
         <div className="space-y-4">
-          <FlowBar stage={stage} next={next} busy={busy} />
+          <FlowBar stage={stage} view={view} next={next} busy={busy}
+            extra={stage === "live" && view === "live" && now < 18 * 60 && (
+              <button disabled={!!busy} onClick={async () => { setBusy("Closing the day…"); await post("/api/demo/clock", { to: "20:00" }); window.location.href = "/merchant/summary"; }}
+                className="rounded-lg border border-line px-3 py-2 text-[13px] font-medium text-ink-2 hover:bg-background disabled:opacity-50">Close the day</button>
+            )} />
 
-          {stage === "idle" && (
+          {view === "idle" && (
             <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
               <div className="relative">
                 <div className="pointer-events-none opacity-60"><Calendar data={data} /></div>
@@ -108,24 +127,30 @@ export default function MerchantPage() {
             </div>
           )}
 
-          {stage === "plan" && (
+          {view === "plan" && (
             <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
               <div className="space-y-3"><Calendar data={data} /><CalendarLegend /></div>
               <div className="h-[660px]"><AgentPanel chat={chat} plan={plan} ownerName={data.merchant.owner_name} asleep={false} /></div>
             </div>
           )}
 
-          {stage === "customers" && <WaveView mode={data.demo.mode} onSent={reload} hideSend />}
+          {view === "customers" && (
+            <WaveView mode={data.demo.mode} alreadySent={waveSent} trigger={trigger} onSending={setBusy} onDone={() => router.replace("/merchant")} />
+          )}
 
-          {(stage === "live" || stage === "done") && (
+          {view === "live" && (
             <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_350px]">
               <div className="min-w-0 space-y-3">
                 <AgentBar chat={chat} />
+                <PaneLabel title="Glow Salon's chairs" sub="What Priya sees. Offers go out, customers pay, chairs turn gold." />
                 <Calendar data={data} pxPerMin={0.85} />
                 <CalendarLegend />
                 <ActivityFeed events={events} limit={5} />
               </div>
-              <LivePhone />
+              <div>
+                <PaneLabel title="Customer's phone" sub="What they see. Type a reply, then pay." />
+                <LivePhone />
+              </div>
             </div>
           )}
           <PaymentToasts events={events} />
@@ -135,36 +160,11 @@ export default function MerchantPage() {
   );
 }
 
-const STEPS: { id: Stage; label: string }[] = [
-  { id: "plan", label: "Morning plan" }, { id: "customers", label: "Choose customers" }, { id: "live", label: "Live sales" }, { id: "done", label: "Day report" },
-];
-
-function FlowBar({ stage, next, busy }: { stage: Stage; next: { label: string; run: () => void } | null; busy: string | null }) {
-  const order: Stage[] = ["idle", "plan", "customers", "live", "done"];
-  const at = order.indexOf(stage);
+function PaneLabel({ title, sub }: { title: string; sub: string }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-surface px-4 py-2.5">
-      <ol className="flex flex-wrap items-center gap-2 text-[13px]">
-        {STEPS.map((s, i) => {
-          const idx = order.indexOf(s.id);
-          const done = at > idx, current = at === idx || (stage === "idle" && i === 0);
-          return (
-            <li key={s.id} className="flex items-center gap-2">
-              {i > 0 && <span className="h-px w-6 bg-line-2" />}
-              <span className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-semibold ${done ? "bg-success text-white" : current ? "bg-accent text-white" : "bg-background text-muted"}`}>
-                {done ? <Check className="h-3 w-3" /> : i + 1}
-              </span>
-              <span className={current ? "font-semibold text-ink" : done ? "text-ink-2" : "text-muted"}>{s.label}</span>
-            </li>
-          );
-        })}
-      </ol>
-      {next && (
-        <button onClick={next.run} disabled={!!busy}
-          className="flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-[13.5px] font-semibold text-white hover:bg-[#1849d6] disabled:opacity-60">
-          {busy ?? next.label} {!busy && <ArrowRight className="h-4 w-4" />}
-        </button>
-      )}
+    <div className="mb-2 flex items-baseline gap-2">
+      <span className="text-[13px] font-semibold text-ink">{title}</span>
+      <span className="text-[12px] text-muted">{sub}</span>
     </div>
   );
 }

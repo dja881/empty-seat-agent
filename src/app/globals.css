@@ -57,3 +57,5 @@ body {
   background-image: repeating-linear-gradient(
     135deg, rgba(102, 112, 133, 0.10) 0 5px, transparent 5px 10px);
 }
+
+@keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }

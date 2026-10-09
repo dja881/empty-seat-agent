@@ -81,3 +81,14 @@ export interface AgentEvent {
   created_at: string;
   clock_at: string | null;
 }
+
+export interface OpenOffer {
+  id: string;
+  customer_id: string;
+  guest_name: string | null;
+  chair: number;
+  start_at: string;
+  end_at: string;
+  status: string;
+  customers: { name: string } | null;
+}

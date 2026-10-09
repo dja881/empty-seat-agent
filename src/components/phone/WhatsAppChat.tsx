@@ -27,15 +27,22 @@ export function WhatsAppChat({ customerId, customerName }: { customerId: string;
   const [text, setText] = useState("");
   const [typing, setTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hidden, setHidden] = useState<Set<string>>(new Set());
   const bottom = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const load = () => supabase.from("messages").select("*").eq("customer_id", customerId).order("created_at")
       .then(({ data }) => data && setMessages(data as Message[]));
     load();
-    const ch = supabase.channel(`thread-${customerId}`)
+    const ch = supabase.channel(`thread-${customerId}-${Math.random()}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "messages", filter: `customer_id=eq.${customerId}` }, (p) => {
-        if (p.eventType === "INSERT" && (p.new as Message).sender !== "customer") setTyping(false);
+        const m = p.new as Message;
+        // Salon messages arrive the way WhatsApp shows them: "typing…" first, then the message.
+        if (p.eventType === "INSERT" && m.sender !== "customer") {
+          setHidden((h) => new Set(h).add(m.id));
+          setTyping(true);
+          setTimeout(() => { setHidden((h) => { const n = new Set(h); n.delete(m.id); return n; }); setTyping(false); }, 1400);
+        }
         load();
       })
       .subscribe();
@@ -89,8 +96,8 @@ export function WhatsAppChat({ customerId, customerName }: { customerId: string;
             No messages from Glow Salon yet. Offers arrive here once the owner approves today&apos;s plan.
           </div>
         )}
-        {messages.map((m) => <Bubble key={m.id} m={m} onLink={(id) => router.push(`/p/${id}?c=${customerId}`)} onCall={callSalon} />)}
-        {typing && (
+        {messages.filter((m) => !hidden.has(m.id)).map((m) => <Bubble key={m.id} m={m} onLink={(id) => router.push(`/p/${id}?c=${customerId}`)} onCall={callSalon} />)}
+        {(typing || hidden.size > 0) && (
           <div className="w-fit rounded-lg rounded-tl-none bg-white px-3 py-2.5 shadow-sm">
             <span className="flex gap-1">{[0, 1, 2].map((i) => <span key={i} className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#8696a0]" style={{ animationDelay: `${i * 120}ms` }} />)}</span>
           </div>

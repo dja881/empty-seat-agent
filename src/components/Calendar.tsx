@@ -73,6 +73,18 @@ export function Calendar({ data, pxPerMin = 0.95 }: { data: BoardData; pxPerMin?
                   <OpenTime key={s.id} slot={s} flash={flashing.has(s.id)}
                     top={y(istMinutes(s.start_at))} minutes={istMinutes(s.end_at) - istMinutes(s.start_at)} pxPerMin={pxPerMin} />
                 ))}
+                {/* A customer is looking at a pay link for this exact time: show who, so the chat and the board connect. */}
+                {(data.offers ?? []).filter((o) => o.chair === chair).map((o) => {
+                  const a = istMinutes(o.start_at), b = istMinutes(o.end_at);
+                  const who = (o.guest_name ?? o.customers?.name ?? "").split(" ")[0];
+                  return (
+                    <div key={o.id} className="absolute inset-x-1.5 z-[3] overflow-hidden rounded-md border-2 border-dashed border-sold bg-sold-soft px-2 pt-1 leading-tight text-sold-ink"
+                      style={{ top: y(a) + 1.5, height: (b - a) * pxPerMin - 3, animation: "fade-in .4s ease" }}>
+                      <div className="truncate text-[12px] font-semibold">{who}</div>
+                      <div className="truncate text-[10.5px] opacity-80">link sent</div>
+                    </div>
+                  );
+                })}
               </div>
             );
           })}
@@ -163,6 +175,7 @@ export function CalendarLegend() {
       <span className="flex items-center gap-1.5">{sw("border border-dashed border-line-2 bg-surface")}Empty</span>
       <span className="flex items-center gap-1.5">{sw("hatch")}Kept for walk-ins</span>
       <span className="flex items-center gap-1.5">{sw("border border-dashed border-accent/60 bg-accent-soft")}Offered</span>
+      <span className="flex items-center gap-1.5">{sw("border-2 border-dashed border-sold bg-sold-soft")}Customer about to pay</span>
       <span className="flex items-center gap-1.5">{sw("bg-sold")}Sold by the agent</span>
     </div>
   );

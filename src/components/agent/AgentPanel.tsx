@@ -38,7 +38,7 @@ export function AgentPanel({ chat, plan, ownerName, asleep }: { chat: Chat; plan
         {chat.lines.map((l, i) => <Bubble key={i} line={l} owner={ownerName} />)}
         {chat.interim && <p className="pl-10 text-right text-[14px] italic text-muted">{chat.interim}</p>}
 
-        {plan && briefed && plan.status !== "approved" && (
+        {plan && briefed && (
           <div className="mt-2 overflow-hidden rounded-lg border border-line">
             {[
               ["Offer", <b key="o" className="tnum">{plan.releasedUnits} empty slots</b>],
