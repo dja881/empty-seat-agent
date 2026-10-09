@@ -8,7 +8,7 @@ import { istMinutes } from "../time";
 export interface OfferDetail {
   id: string; customer_id: string; guest_name: string | null; service_id: string; chair: number;
   start_at: string; end_at: string; price: number; funded_amount: number; funder: string | null;
-  status: string; razorpay_order_id: string | null; group_id: string | null;
+  status: string; razorpay_order_id: string | null; group_id: string | null; wave: number;
   customers: { name: string; phone: string } | null;
   services: { name: string; duration_min: number } | null;
 }
@@ -43,6 +43,7 @@ export function alternatives(day: Day, o: OfferDetail, n = 3) {
  */
 export async function settle(offerId: string, p: {
   orderId: string | null; paymentId: string | null; amount: number; funded: number; simulated: boolean;
+  channel?: "online" | "front_desk";
 }) {
   const result = must(await db.rpc("settle_offer", {
     p_offer: offerId, p_order: p.orderId, p_payment: p.paymentId,
@@ -56,9 +57,11 @@ export async function settle(offerId: string, p: {
   const when = timeLabel(istMinutes(o.start_at));
 
   if (result === "paid") {
-    await postMessage(day, o.customer_id, "salon",
-      `Booked. ${o.services?.name} for ${who.split(" ")[0]} at ${when} today with ${stylist}. ` +
-      `₹${p.amount} received through Razorpay. See you soon!`, { receipt: { offer_id: o.id, payment_id: p.paymentId } });
+    await postMessage(day, o.customer_id, p.channel === "front_desk" ? "front_desk" : "salon",
+      p.channel === "front_desk"
+        ? `Booked over the phone: ${o.services?.name.toLowerCase()} for ${who.split(" ")[0]} at ${when} today with ${stylist}, ₹${p.amount} at the counter. See you soon!`
+        : `Booked. ${o.services?.name} for ${who.split(" ")[0]} at ${when} today with ${stylist}. ₹${p.amount} received through Razorpay. See you soon!`,
+      { receipt: { offer_id: o.id, payment_id: p.paymentId } });
   }
   if (result === "taken") {
     if (p.paymentId && !p.simulated) {

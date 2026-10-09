@@ -54,7 +54,8 @@ export async function handleCustomerMessage(customerId: string, text: string) {
 
   const decided = day.demo.scripted ? null : await decide(day, customer, thread, open);
   const out = decided ?? scriptedReply(day, customer, text, open);
-  return execute(day, customer, out, open);
+  if (!decided && !day.demo.scripted) console.warn("salon agent: model unavailable, used scripted reply");
+  return execute(day, customer, out, open, decided ? "model" : "script");
 }
 
 /* ---------------- the LLM step ---------------- */
@@ -114,24 +115,24 @@ Reply with JSON only:
 
 /* ---------------- enforcement and side effects ---------------- */
 
-async function execute(day: Day, customer: CustomerRow, out: AgentOutput, open: OpenOffer[]) {
+async function execute(day: Day, customer: CustomerRow, out: AgentOutput, open: OpenOffer[], by: "model" | "script") {
   const action: Action = ACTIONS.includes(out.action) ? out.action : "hand_to_owner";
 
   if (action === "add_to_waitlist") {
     await logEvent("waitlist", { customer: customer.name, time: out.time });
-    return postMessage(day, customer.id, "salon", out.message || "I've added you to the waitlist. I'll message you if a chair opens up.");
+    return postMessage(day, customer.id, "salon", out.message || "I've added you to the waitlist. I'll message you if a chair opens up.", { by });
   }
   if (action === "alert_front_desk" || action === "hand_to_owner") {
     await logEvent("call_me", { customer: customer.name, customer_id: customer.id, reason: out.message });
-    return postMessage(day, customer.id, "salon", out.message || `I'll call you in a few minutes. ${day.merchant.front_desk_name}`, { call_me: true });
+    return postMessage(day, customer.id, "salon", out.message || `I'll call you in a few minutes. ${day.merchant.front_desk_name}`, { call_me: true, by });
   }
   if (action === "decline") {
     await cancelOpenOffers(customer.id);
     await refreshOffered();
-    return postMessage(day, customer.id, "salon", out.message || "No problem. See you next time.");
+    return postMessage(day, customer.id, "salon", out.message || "No problem. See you next time.", { by });
   }
   if (!OFFER_ACTIONS.includes(action)) {
-    return postMessage(day, customer.id, "salon", out.message || "Let me check and get back to you.");
+    return postMessage(day, customer.id, "salon", out.message || "Let me check and get back to you.", { by });
   }
 
   // An offer: resolve service, time, party and price, then hold them to the limits.
@@ -181,7 +182,7 @@ async function execute(day: Day, customer: CustomerRow, out: AgentOutput, open: 
   await db.from("offers").update({ status: "link_sent" }).in("id", links.map((l) => l.offer_id));
   await refreshOffered();
   await logEvent("offer_sent", { customer: customer.name, time: timeLabel(slot.start), price, party, adjusted });
-  return postMessage(day, customer.id, "salon", message, { links });
+  return postMessage(day, customer.id, "salon", message, { links, by });
 }
 
 /** Second pass when code changed what the agent proposed: say exactly what will be sent. */

@@ -15,9 +15,9 @@ const BEATS: { id: string; label: string; hint: string; steps: Step[]; after?: s
   {
     id: "afternoon", label: "Fast-forward 2 to 6 pm", hint: "Released slot sells, walk-ins arrive",
     steps: [
-      { to: "14:00", simulate: ["sale", "sale"] }, { to: "14:45", simulate: ["walk_in"] },
-      { to: "15:30", simulate: ["call_me", "walk_in"] }, { to: "16:15", simulate: ["walk_in"] },
-      { to: "17:00" }, { to: "18:00" },
+      { to: "14:00", simulate: ["sale", "sale"] }, { to: "15:00", simulate: ["walk_in"] },
+      { to: "15:30", simulate: ["call_me", "walk_in"] }, { to: "16:00", simulate: ["walk_in", "walk_in"] },
+      { to: "17:00", simulate: ["walk_in", "walk_in"] }, { to: "18:00" },
     ],
   },
   { id: "close", label: "Close the day at 8 pm", hint: "Daily report", steps: [{ to: "20:00" }], after: "/merchant/summary" },

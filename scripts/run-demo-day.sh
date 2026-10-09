@@ -15,8 +15,8 @@ for t in 11:50 12:20 12:50; do p /api/demo/clock "{\"to\":\"$t\",\"simulate\":[\
 p /api/demo/clock '{"to":"13:30"}'
 echo "--- 2 to 6 pm"
 p /api/demo/clock '{"to":"14:00","simulate":["sale","sale"]}'
-p /api/demo/clock '{"to":"14:45","simulate":["walk_in"]}'
+p /api/demo/clock '{"to":"15:00","simulate":["walk_in"]}'
 p /api/demo/clock '{"to":"15:30","simulate":["call_me","walk_in"]}'
-p /api/demo/clock '{"to":"16:15","simulate":["walk_in"]}'
-p /api/demo/clock '{"to":"17:00","simulate":["walk_in"]}'
+p /api/demo/clock '{"to":"16:00","simulate":["walk_in","walk_in"]}'
+p /api/demo/clock '{"to":"17:00","simulate":["walk_in","walk_in"]}'
 p /api/demo/clock '{"to":"18:00","simulate":[]}'

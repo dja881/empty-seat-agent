@@ -107,7 +107,8 @@ select 'Hyderabad', s.service, p.day_part, l.lead_time,
   round((s.base * p.f * l.f)::numeric, 2),
   s.disc, round((0.4 + 0.3 * h01(s.service || p.day_part || l.lead_time))::numeric, 2),
   24 + floor(h01('n' || s.service || p.day_part || l.lead_time) * 20)::int
-from (values ('Haircut', 0.30, 70), ('Hair spa', 0.24, 180), ('Beard trim', 0.38, 40)) s(service, base, disc),
+-- fill_rate: what similar salons fill of empty time on their own, without an agent
+from (values ('Haircut', 0.18, 70), ('Hair spa', 0.144, 180), ('Beard trim', 0.228, 40)) s(service, base, disc),
      (values ('morning', 0.9), ('afternoon', 1.0), ('evening', 1.2)) p(day_part, f),
      (values ('same_day', 1.0), ('next_day', 1.25)) l(lead_time, f);
 

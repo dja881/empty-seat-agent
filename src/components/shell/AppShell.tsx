@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  BarChart3, CalendarDays, ChevronsUpDown, CreditCard, Headset, Home, Settings2, Users, Armchair,
+  BarChart3, CalendarDays, Handshake, ChevronsUpDown, CreditCard, Headset, Home, Settings2, Users, Armchair,
 } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -18,6 +18,7 @@ const AGENT_NAV = [
   { href: "/merchant", label: "Empty Seat Agent", icon: Armchair, live: true },
   { href: "/merchant/front-desk", label: "Front desk", icon: Headset },
   { href: "/merchant/summary", label: "Daily report", icon: BarChart3 },
+  { href: "/agents", label: "Negotiations", icon: Handshake },
   { href: "/merchant/settings", label: "Agent settings", icon: Settings2 },
 ];
 

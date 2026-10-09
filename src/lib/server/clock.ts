@@ -181,21 +181,28 @@ async function callMe(day: Day) {
 
 /** A walk-in arrives and takes held time: proof the hold was worth keeping. */
 async function walkIn(day: Day) {
-  const held = day.slots
-    .filter((s) => s.state === "held" && istMinutes(s.end_at) - Math.max(istMinutes(s.start_at), day.now) >= 45)
-    .sort((a, b) => istMinutes(a.start_at) - istMinutes(b.start_at))[0];
+  // Someone walking in now or within the next 45 minutes, into held time.
+  const fits = (s: Day["slots"][number]) => {
+    const from = Math.ceil(Math.max(istMinutes(s.start_at), day.now) / 15) * 15;
+    return istMinutes(s.end_at) - from;
+  };
+  const options = day.slots
+    .filter((s) => s.state === "held" && istMinutes(s.start_at) <= day.now + 45 && fits(s) >= 20)
+    .sort((a, b) => istMinutes(a.start_at) - istMinutes(b.start_at) || a.chair - b.chair);
+  const held = options[day.demo.sim_step % Math.max(options.length, 1)];
   if (!held) return null;
   const start = Math.ceil(Math.max(istMinutes(held.start_at), day.now) / 15) * 15;
+  const svc = fits(held) >= 45 ? { id: "svc_haircut", dur: 45, price: 450 } : { id: "svc_beard", dur: 20, price: 200 };
   const a = istMinutes(held.start_at), b = istMinutes(held.end_at);
-  if (start + 45 > b) return null;
   const date = day.demo.demo_date;
   const rest = [];
   if (start - a >= 20) rest.push({ merchant_id: MERCHANT_ID, chair: held.chair, start_at: held.start_at, end_at: atMinutes(date, start), state: "held" });
-  if (b - (start + 45) >= 20) rest.push({ merchant_id: MERCHANT_ID, chair: held.chair, start_at: atMinutes(date, start + 45), end_at: held.end_at, state: "held" });
+  if (b - (start + svc.dur) >= 20) rest.push({ merchant_id: MERCHANT_ID, chair: held.chair, start_at: atMinutes(date, start + svc.dur), end_at: held.end_at, state: "held" });
   must(await db.from("slots").delete().eq("id", held.id), "carve held");
   if (rest.length) must(await db.from("slots").insert(rest), "rest of held");
-  must(await db.from("bookings").insert({ merchant_id: MERCHANT_ID, service_id: "svc_haircut", chair: held.chair,
-    start_at: atMinutes(date, start), end_at: atMinutes(date, start + 45), price: 450, source: "walk_in" }), "walk-in");
+  must(await db.from("bookings").insert({ merchant_id: MERCHANT_ID, service_id: svc.id, chair: held.chair,
+    start_at: atMinutes(date, start), end_at: atMinutes(date, start + svc.dur), price: svc.price, source: "walk_in" }), "walk-in");
+  must(await db.from("demo_state").update({ sim_step: day.demo.sim_step + 1 }).eq("merchant_id", MERCHANT_ID), "sim step");
   await logEvent("walk_in", { chair: held.chair, start: timeLabel(start) });
   return `walk-in at ${timeLabel(start)} on chair ${held.chair}`;
 }
