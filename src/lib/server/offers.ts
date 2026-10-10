@@ -64,7 +64,7 @@ export function openerText(day: Day, c: CustomerRow, service: ServiceRow, start:
   const weeks = Math.max(1, Math.round((new Date(day.demo.clock_at).getTime() - new Date(c.last_visit_at).getTime()) / (7 * 86400000)));
   const funding = fundingFor(day, c, price);
   const bank = funding ? `, or ₹${price - funding.amount} with an ${funding.issuer} card` : "";
-  return `Hi ${first(c.name)}, this is ${day.merchant.front_desk_name} from ${day.merchant.name}. ` +
+  return `Hi ${first(c.name)}, this is ${day.merchant.front_desk_name} from ${day.merchant.name.replace(/\.$/, "")}. ` +
     `It's been ${weeks} weeks since your last ${service.name.toLowerCase()}. ` +
     `${timeLabel(start)} today: ₹${price} if you pay now${bank}. Usually ₹${service.price}. ` +
     `Tap to call me anytime.`;

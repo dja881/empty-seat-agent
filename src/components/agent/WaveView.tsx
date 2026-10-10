@@ -130,7 +130,7 @@ export function WaveView({ mode, alreadySent, trigger, onSending, onDone }: {
               <div className="text-[13px] font-semibold text-ink">The message</div>
               <div className="mt-3 rounded-lg bg-[#efeae2] p-3">
                 <div className="rounded-lg rounded-tl-none bg-white p-2.5 text-[12.5px] leading-snug text-[#111b21] shadow-sm">
-                  Hi {preview.name.split(" ")[0]}, this is Sneha from Strand & Co.. It&apos;s been 6 weeks since your last {preview.service.toLowerCase()}. {preview.time} today: ₹{preview.price} if you pay now{preview.hdfc ? `, or ₹${preview.price - 50} with an HDFC card` : ""}. Usually ₹{preview.list}. Tap to call me anytime.
+                  Hi {preview.name.split(" ")[0]}, this is Sneha from Strand & Co. It&apos;s been 6 weeks since your last {preview.service.toLowerCase()}. {preview.time} today: ₹{preview.price} if you pay now{preview.hdfc ? `, or ₹${preview.price - 50} with an HDFC card` : ""}. Usually ₹{preview.list}. Tap to call me anytime.
                   <div className="mt-2 border-t border-[#e9edef] pt-1.5 text-center font-medium text-[#027eb5]">Pay ₹{preview.price}</div>
                 </div>
               </div>
