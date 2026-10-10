@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* Merchant dashboard tokens. Neutral surfaces, one blue accent, service colours on the
-   calendar the way salon software colours appointments, amber for agent-sold time. */
+   calendar the way salon software colours appointments, green for agent-sold time. */
 :root {
   --background: #f6f7f9;
   --foreground: #101828;
@@ -24,9 +24,9 @@
   --color-warn: #b54708;
   --color-warn-soft: #fffaeb;
   --color-danger: #d92d20;
-  --color-sold: #f5b800;
-  --color-sold-soft: #fff6d6;
-  --color-sold-ink: #6b4e00;
+  --color-sold: #12b76a;
+  --color-sold-soft: #e3f9ee;
+  --color-sold-ink: #05603a;
   --font-sans: var(--font-inter);
   --font-mono: var(--font-mono);
 }
@@ -39,11 +39,11 @@ body {
 
 .tnum { font-variant-numeric: tabular-nums; }
 
-/* Agent-sold block: one warm flash when payment lands. */
+/* Agent-sold block: one bright flash when payment lands. */
 @keyframes sold-flash {
-  0% { box-shadow: 0 0 0 0 rgba(245, 184, 0, 0.75); filter: brightness(1.08); }
-  60% { box-shadow: 0 0 0 8px rgba(245, 184, 0, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(245, 184, 0, 0); filter: none; }
+  0% { box-shadow: 0 0 0 0 rgba(18, 183, 106, 0.75); filter: brightness(1.08); }
+  60% { box-shadow: 0 0 0 8px rgba(18, 183, 106, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(18, 183, 106, 0); filter: none; }
 }
 .sold-flash { animation: sold-flash 1.4s ease-out; }
 

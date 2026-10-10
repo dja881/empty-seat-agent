@@ -128,7 +128,7 @@ function OpenTime({ slot, flash, top, minutes, pxPerMin }: { slot: Slot; flash: 
   switch (slot.state) {
     case "paid":
       return (
-        <div className={`${box} bg-sold text-[#3d2c00] shadow-sm ${flash ? "sold-flash" : ""}`} style={pos}>
+        <div className={`${box} bg-sold text-white shadow-sm ${flash ? "sold-flash" : ""}`} style={pos}>
           <div className="truncate text-[13px] font-semibold">{slot.sold_to?.split(" ")[0]}</div>
           {h >= 34 && <div className="tnum truncate text-[11.5px] font-medium opacity-80">{slot.sold_price ? rupees(slot.sold_price) : ""} paid</div>}
         </div>
