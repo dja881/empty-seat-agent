@@ -43,7 +43,7 @@ export default function PhonePage({ params }: { params: Promise<{ customer: stri
     <PhoneFrame clock={clock?.clock_at} dark={showChat}>
       {showChat
         ? <WhatsAppChat customerId={id} customerName={name} />
-        : <LockScreen clock={clock?.clock_at} from="Glow Salon" text={first?.body} onOpen={open} />}
+        : <LockScreen clock={clock?.clock_at} from="Strand & Co." text={first?.body} onOpen={open} />}
     </PhoneFrame>
   );
 }

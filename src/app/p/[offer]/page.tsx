@@ -67,7 +67,7 @@ function PayView({ offerId }: { offerId: string }) {
       currency: "INR",
       name: offer.salon.name,
       description: `${offer.service} · ${label(offer.start)} with ${offer.stylist}`,
-      image: location.protocol === "https:" ? `${location.origin}/glow-logo.png` : undefined,
+      image: location.protocol === "https:" ? `${location.origin}/strand-mark.png` : undefined,
       prefill: { name: order.customer, contact: order.phone },
       notes: { offer_id: offerId },
       theme: { color: "#0c2651" },
@@ -115,8 +115,8 @@ function PayView({ offerId }: { offerId: string }) {
           <button onClick={() => router.push(back)} aria-label="Back to chat" className="p-1"><ChevronLeft className="h-5 w-5 text-[#344054]" /></button>
         ) : <span className="w-7" />}
         <div className="min-w-0 flex-1 text-center leading-tight">
-          <div className="truncate text-[13px] font-medium text-[#101828]">Glow Salon · Secure booking</div>
-          <div className="flex items-center justify-center gap-1 truncate text-[11px] text-[#667085]"><Lock className="h-3 w-3" /> pay.glowsalon.in</div>
+          <div className="truncate text-[13px] font-medium text-[#101828]">Strand & Co. · Secure booking</div>
+          <div className="flex items-center justify-center gap-1 truncate text-[11px] text-[#667085]"><Lock className="h-3 w-3" /> pay.strandandco.in</div>
         </div>
         <span className="w-7" />
       </div>
@@ -127,7 +127,7 @@ function PayView({ offerId }: { offerId: string }) {
         {offer && (
           <div className="flex items-center gap-3 bg-white px-5 pb-4 pt-5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/glow-logo.svg" alt="" className="h-12 w-12 rounded-xl" />
+            <img src="/strand-mark.svg" alt="" className="h-12 w-12 rounded-xl" />
             <div>
               <div className="text-[17px] font-semibold text-[#101828]">{offer.salon.name}</div>
               <div className="text-[13px] text-[#667085]">Madhapur, Hyderabad</div>

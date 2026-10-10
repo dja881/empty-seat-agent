@@ -35,9 +35,9 @@ export function AppShell({ title, crumbs, actions, children }: {
       <aside className="sticky top-0 hidden h-screen w-[232px] shrink-0 flex-col border-r border-line bg-surface lg:flex">
         <button className="mx-3 mt-3 flex items-center gap-2.5 rounded-lg px-2 py-2 text-left hover:bg-background">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/glow-logo.svg" alt="" className="h-8 w-8 rounded-md" />
+          <img src="/strand-mark.svg" alt="" className="h-8 w-8 rounded-md" />
           <span className="min-w-0 flex-1">
-            <span className="block truncate text-[13px] font-semibold text-ink">Glow Salon</span>
+            <span className="block truncate text-[13px] font-semibold text-ink">Strand & Co.</span>
             <span className="block truncate text-[12px] text-muted">Madhapur, Hyderabad</span>
           </span>
           <ChevronsUpDown className="h-4 w-4 text-faint" />

@@ -155,7 +155,7 @@ function Merchant() {
             <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_350px]">
               <div className="min-w-0 space-y-3">
                 <AgentBar chat={chat} />
-                <PaneLabel title="Glow Salon's chairs" sub="What Priya sees. Offers go out, customers pay, chairs turn gold." />
+                <PaneLabel title="Strand & Co.'s chairs" sub="What Priya sees. Offers go out, customers pay, chairs turn gold." />
                 <Calendar data={data} pxPerMin={0.85} />
                 <CalendarLegend />
                 <ActivityFeed events={events} limit={5} />

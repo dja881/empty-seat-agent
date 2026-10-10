@@ -74,15 +74,15 @@ export function WhatsAppChat({ customerId, customerName }: { customerId: string;
       <div className="flex shrink-0 items-center gap-2 bg-[#008069] px-2 py-2 text-white">
         <ArrowLeft className="h-5 w-5" />
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/glow-logo.svg" alt="" className="h-9 w-9 rounded-full bg-white" />
+        <img src="/strand-mark.svg" alt="" className="h-9 w-9 rounded-full bg-white" />
         <div className="min-w-0 flex-1 leading-tight">
           <div className="flex items-center gap-1 text-[16px] font-medium">
-            Glow Salon <BadgeCheck className="h-4 w-4 fill-[#25d366] text-[#008069]" />
+            Strand & Co. <BadgeCheck className="h-4 w-4 fill-[#25d366] text-[#008069]" />
           </div>
           <div className="text-[12px] text-white/80">{typing ? "typing…" : "Business account"}</div>
         </div>
         <Video className="h-5 w-5 opacity-90" />
-        <button onClick={callSalon} aria-label="Call Glow Salon" className="p-2"><Phone className="h-5 w-5" /></button>
+        <button onClick={callSalon} aria-label="Call Strand & Co." className="p-2"><Phone className="h-5 w-5" /></button>
       </div>
 
       {/* thread */}
@@ -93,7 +93,7 @@ export function WhatsAppChat({ customerId, customerName }: { customerId: string;
         </div>
         {!messages.length && (
           <div className="mx-auto mt-6 max-w-[80%] text-center text-[12.5px] text-[#54656f]">
-            No messages from Glow Salon yet. Offers arrive here once the owner approves today&apos;s plan.
+            No messages from Strand & Co. yet. Offers arrive here once the owner approves today&apos;s plan.
           </div>
         )}
         {messages.filter((m) => !hidden.has(m.id)).map((m) => <Bubble key={m.id} m={m} onLink={(id) => router.push(`/p/${id}?c=${customerId}`)} onCall={callSalon} />)}
@@ -126,7 +126,7 @@ export function WhatsAppChat({ customerId, customerName }: { customerId: string;
           <SendHorizontal className="h-5 w-5" />
         </button>
       </form>
-      <span className="sr-only">Chat with Glow Salon as {customerName}</span>
+      <span className="sr-only">Chat with Strand & Co. as {customerName}</span>
     </div>
   );
 }

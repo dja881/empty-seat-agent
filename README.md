@@ -7,7 +7,7 @@ sell their last seats. It agrees a plan with the owner each morning, sends one-t
 receptionist's name, negotiates within the owner's limits, and locks each slot the moment the
 customer pays through Razorpay.
 
-Demo salon: Glow Salon, Madhapur, Hyderabad. All data is synthetic.
+Demo salon: Strand & Co., Madhapur, Hyderabad. All data is synthetic.
 
 ## Stack
 

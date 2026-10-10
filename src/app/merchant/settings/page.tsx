@@ -133,7 +133,7 @@ export default function SettingsPage() {
               ))}
             </Card>
 
-            <Card title="Messaging" sub="Sent from Glow Salon's WhatsApp Business number.">
+            <Card title="Messaging" sub="Sent from Strand & Co.'s WhatsApp Business number.">
               <div className="grid grid-cols-2 gap-3">
                 <Field label="Daily message cap"><input type="number" value={m.daily_message_cap} onChange={(e) => set("daily_message_cap", Number(e.target.value))} className="input" /></Field>
                 <Field label="Quiet hours">

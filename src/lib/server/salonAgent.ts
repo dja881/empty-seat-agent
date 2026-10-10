@@ -42,7 +42,7 @@ export async function handleCustomerMessage(customerId: string, text: string) {
     await db.from("customers").update({ opted_out: true }).eq("id", customerId);
     await cancelOpenOffers(customerId);
     await refreshOffered();
-    return postMessage(day, customerId, "salon", "You won't get offers from Glow Salon again. Reply START anytime to opt back in.");
+    return postMessage(day, customerId, "salon", "You won't get offers from Strand & Co. again. Reply START anytime to opt back in.");
   }
 
   const [threadRes, offersRes] = await Promise.all([

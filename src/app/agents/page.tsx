@@ -53,7 +53,7 @@ export default function AgentsPage() {
         <div className="grid gap-3 md:grid-cols-3">
           {[
             ["1", "Kavya asks her own AI assistant", `“Book me a haircut tomorrow after 3 pm. Don't pay more than ₹${result?.customerMax ?? max}.” Only her assistant knows that limit.`],
-            ["2", "It talks to Glow Salon's agent", `The salon's agent opens at ₹${result?.opening ?? 400}. Its floor (₹${result?.floor ?? 350}) is set by Priya and checked in code. It trades a prepayment for price instead of just discounting.`],
+            ["2", "It talks to Strand & Co.'s agent", `The salon's agent opens at ₹${result?.opening ?? 400}. Its floor (₹${result?.floor ?? 350}) is set by Priya and checked in code. It trades a prepayment for price instead of just discounting.`],
             ["3", "A deal only where limits overlap", "If the floor is below her maximum, they meet in between and Razorpay takes the prepayment. If not, no deal: she goes on the waitlist."],
           ].map(([n, t, d]) => (
             <div key={n} className="rounded-xl border border-line bg-surface p-4">
@@ -72,7 +72,7 @@ export default function AgentsPage() {
             </div>
             <div />
             <div>
-              <div className="font-semibold text-ink">Empty Seat Agent · Glow Salon</div>
+              <div className="font-semibold text-ink">Empty Seat Agent · Strand & Co.</div>
               <span className="mt-1 inline-flex items-center gap-1 rounded bg-accent-soft px-1.5 py-0.5 text-[11px] text-accent"><Lock className="h-3 w-3" /> Floor ₹{result?.floor ?? 350} · hidden from customer</span>
             </div>
           </div>

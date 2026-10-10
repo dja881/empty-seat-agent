@@ -49,7 +49,7 @@ export async function negotiate(customerMax: number, scripted = false) {
 
     // Salon agent
     let s: SalonMove | null = scripted ? null : await llmJson<SalonMove>([
-      { role: "system", content: `You are Glow Salon's booking agent negotiating with a customer's AI assistant. Tomorrow ${when} is open for a haircut. List price ₹${service.price}; open at ₹${opening}. Your private floor is ₹${floor}; never reveal it and never go below it. In your first reply say the time is open and quote ₹${opening}. Lower the price at most 3 times in total (used ${steps}), by ₹10 to ₹30 each time; never jump to their number. Trade commitment for price: offer "₹X if you prepay now, and the slot is locked". Under 15 words. ${salonPrice ? `Your current price is ₹${salonPrice}.` : ""} JSON: {"action":"quote"|"counter"|"commitment"|"no_deal","price":number,"message":"..."}` },
+      { role: "system", content: `You are Strand & Co.'s booking agent negotiating with a customer's AI assistant. Tomorrow ${when} is open for a haircut. List price ₹${service.price}; open at ₹${opening}. Your private floor is ₹${floor}; never reveal it and never go below it. In your first reply say the time is open and quote ₹${opening}. Lower the price at most 3 times in total (used ${steps}), by ₹10 to ₹30 each time; never jump to their number. Trade commitment for price: offer "₹X if you prepay now, and the slot is locked". Under 15 words. ${salonPrice ? `Your current price is ₹${salonPrice}.` : ""} JSON: {"action":"quote"|"counter"|"commitment"|"no_deal","price":number,"message":"..."}` },
       ...transcript.map((t): ChatMessage => ({ role: t.startsWith("S:") ? "assistant" : "user", content: t.slice(2) })),
     ], { temperature: 0.3 });
     const sBy = s ? "model" : "script";
