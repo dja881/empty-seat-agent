@@ -9,3 +9,8 @@ export const BRAND = {
   payDomain: "pay.strandandco.in",
   ink: "#0b1220",                  // the logo's midnight background
 } as const;
+
+// Chairs are shown by role, so someone watching the demo knows who works where without
+// learning six names. Stylists' names still appear in messages to customers.
+export const CHAIR_ROLES = ["Senior stylist", "Stylist", "Stylist", "Colour specialist", "Junior stylist", "Barber"] as const;
+export const chairRole = (chair: number) => CHAIR_ROLES[chair - 1] ?? "Stylist";

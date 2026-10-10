@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { BoardData } from "@/lib/useBoardData";
 import type { Slot } from "@/lib/types";
 import { hhmmToMinutes, istMinutes, rupees } from "@/lib/time";
+import { chairRole } from "@/lib/brand";
 
 const AVATAR_TINTS = ["#fde2e4", "#dbeafe", "#e0e7ff", "#dcfce7", "#fef3c7", "#fce7f3"];
 
@@ -39,12 +40,12 @@ export function Calendar({ data, pxPerMin = 0.95 }: { data: BoardData; pxPerMin?
         <div className="sticky top-0 z-10 flex border-b border-line bg-surface">
           <div className="w-14 shrink-0" />
           {merchant.stylists.map((name, i) => (
-            <div key={name} className="flex min-w-0 flex-1 items-center gap-2 border-l border-line px-3 py-2.5">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12px] font-semibold text-ink-2"
-                style={{ background: AVATAR_TINTS[i % AVATAR_TINTS.length] }}>{name[0]}</span>
+            <div key={name} className="flex min-w-0 flex-1 items-center gap-2 border-l border-line px-3 py-2.5" title={name}>
+              <span className="tnum flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12px] font-semibold text-ink-2"
+                style={{ background: AVATAR_TINTS[i % AVATAR_TINTS.length] }}>{i + 1}</span>
               <span className="min-w-0">
-                <span className="block truncate text-[13px] font-medium text-ink">{name}</span>
-                <span className="block text-[11px] text-muted">Chair {i + 1}</span>
+                <span className="block truncate text-[13px] font-semibold text-ink">Chair {i + 1}</span>
+                <span className="block truncate text-[11px] text-muted">{chairRole(i + 1)}</span>
               </span>
             </div>
           ))}

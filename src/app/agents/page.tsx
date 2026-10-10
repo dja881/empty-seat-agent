@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Lock } from "lucide-react";
 import { AppShell } from "@/components/shell/AppShell";
+import { chairRole } from "@/lib/brand";
 
 interface Round { n: number; customer: { text: string; price?: number }; salon: { text: string; price?: number } }
 interface Result {
@@ -108,7 +109,7 @@ export default function AgentsPage() {
               <div className="rounded-xl border border-success/40 bg-surface p-4">
                 <div className="text-[12px] text-muted">Booking</div>
                 <div className="tnum text-[22px] font-semibold text-success">₹{result.deal} · prepaid</div>
-                <p className="mt-1 text-[13px] text-ink-2">{result.when} · Chair {result.chair}, {result.stylist}. Razorpay order created; the slot locks on payment.</p>
+                <p className="mt-1 text-[13px] text-ink-2">{result.when} · Chair {result.chair} ({chairRole(result.chair).toLowerCase()}). Razorpay order created; the slot locks on payment.</p>
                 {result.order && <p className="mt-2 font-mono text-[11.5px] text-faint">{result.order}</p>}
               </div>
             ) : (

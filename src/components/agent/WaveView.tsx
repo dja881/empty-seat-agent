@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, Loader2 } from "lucide-react";
 import { rupees } from "@/lib/time";
+import { chairRole } from "@/lib/brand";
 
 interface Row {
   customerId: string; serviceId: string; start: number; name: string; reasons: string[]; service: string; duration: number;
@@ -94,7 +95,7 @@ export function WaveView({ mode, alreadySent, trigger, onSending, onDone }: {
                         <span><span className="block font-medium text-ink">{r.name}</span><span className="block text-[12px] text-muted">{r.service} · {r.duration} min</span></span>
                       </div>
                     </td>
-                    <td className="px-3 py-2.5"><span className="tnum block font-medium text-ink">{r.time}</span><span className="block text-[12px] text-muted">Chair {r.chair} · {r.stylist}</span></td>
+                    <td className="px-3 py-2.5"><span className="tnum block font-medium text-ink">{r.time}</span><span className="block text-[12px] text-muted">Chair {r.chair} · {chairRole(r.chair)}</span></td>
                     <td className="px-3 py-2.5 text-[12.5px] text-ink-2">{r.reasons.join(" · ")}</td>
                     <td className="px-3 py-2.5 text-right">
                       <span className="tnum block font-semibold text-ink">{rupees(r.price)}</span>

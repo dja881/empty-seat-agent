@@ -59,8 +59,8 @@ export async function settle(offerId: string, p: {
   if (result === "paid") {
     await postMessage(day, o.customer_id, p.channel === "front_desk" ? "front_desk" : "salon",
       p.channel === "front_desk"
-        ? `Booked over the phone: ${o.services?.name.toLowerCase()} for ${who.split(" ")[0]} at ${when} today with ${stylist}, ₹${p.amount} at the counter. See you soon!`
-        : `Booked. ${o.services?.name} for ${who.split(" ")[0]} at ${when} today with ${stylist}. ₹${p.amount} received through Razorpay. See you soon!`,
+        ? `Booked over the phone: ${o.services?.name.toLowerCase()} for ${who.split(" ")[0]} at ${when} today with ${stylist} (chair ${o.chair}), ₹${p.amount} at the counter. See you soon!`
+        : `Booked. ${o.services?.name} for ${who.split(" ")[0]} at ${when} today with ${stylist}, chair ${o.chair}. ₹${p.amount} received through Razorpay. See you soon!`,
       { receipt: { offer_id: o.id, payment_id: p.paymentId } });
   }
   if (result === "taken") {
