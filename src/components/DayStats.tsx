@@ -5,7 +5,7 @@ import type { BoardData } from "@/lib/useBoardData";
 import { emptySlotCount, soldRevenue } from "@/lib/slots";
 import { formatClockFull, formatDay, rupees } from "@/lib/time";
 
-/** Header stats: demo clock, open slots, revenue the agent has recovered today. */
+/** Header stats: demo clock, open slots, booking revenue from slots the agent sold today (the report's total, before the estimate of what is extra). */
 export function DayStats({ data }: { data: BoardData }) {
   const revenue = useCountUp(soldRevenue(data.slots));
   const stat = (label: string, value: React.ReactNode, cls = "text-ink") => (
@@ -18,7 +18,7 @@ export function DayStats({ data }: { data: BoardData }) {
     <div className="flex items-center divide-x divide-line">
       {stat(formatDay(data.demo.clock_at).replace(/^\w+, /, ""), formatClockFull(data.demo.clock_at))}
       {stat("Open slots", emptySlotCount(data.slots))}
-      {stat("Recovered today", rupees(revenue), "text-success")}
+      {stat("Booked by RAY", rupees(revenue), "text-success")}
     </div>
   );
 }
