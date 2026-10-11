@@ -133,19 +133,31 @@ async function simulateSale(day: Day) {
   // The released-at-1:30 slot's wave 2 customer buys first if they're still open.
   const open = must(await db.from("offers").select("*, customers(*)").in("status", ["sent", "link_sent"])
     .gt("start_at", atMinutes(day.demo.demo_date, day.now + 15)).order("wave", { ascending: false }), "open offers") as
-    { id: string; customer_id: string; wave: number; funded_amount: number; customers: CustomerRow }[];
-  const wave2 = open.find((o) => o.wave === 2 && !paidBy.has(o.customer_id) && o.customer_id !== "c_riya");
+    { id: string; customer_id: string; wave: number; funded_amount: number; status: string; chair: number; start_at: string; end_at: string; customers: CustomerRow }[];
+  // A link agreed in a real conversation (status link_sent) belongs to the person typing on the
+  // phone. The simulator never buys that slot from under them, and never buys on their behalf.
+  const live = open.filter((o) => o.status === "link_sent");
+  const liveCustomers = new Set(live.map((o) => o.customer_id));
+  const clashes = (chair: number, startAt: string, endAt: string) =>
+    live.some((l) => l.chair === chair && Date.parse(l.start_at) < Date.parse(endAt) && Date.parse(l.end_at) > Date.parse(startAt));
+  const wave2 = open.find((o) => o.wave === 2 && !paidBy.has(o.customer_id) && o.customer_id !== "c_riya"
+    && !liveCustomers.has(o.customer_id) && !clashes(o.chair, o.start_at, o.end_at));
 
   let offerId: string | null = wave2?.id ?? null;
   let customer: CustomerRow | null = wave2?.customers ?? null;
   if (!offerId) {
     for (const id of SIM_BUYERS) {
-      if (paidBy.has(id)) continue;
+      if (paidBy.has(id) || liveCustomers.has(id)) continue;
       const existing = open.find((o) => o.customer_id === id);
-      if (existing) { offerId = existing.id; customer = existing.customers; break; }
+      if (existing && !clashes(existing.chair, existing.start_at, existing.end_at)) { offerId = existing.id; customer = existing.customers; break; }
+      // Their slot is promised to someone mid-conversation: withdraw it and offer another time.
+      if (existing) must(await db.from("offers").update({ status: "cancelled" }).eq("id", existing.id), "withdraw offer");
       const c = must(await db.from("customers").select("*").eq("id", id).single(), "customer") as CustomerRow;
       const service = day.services.find((s) => s.id === c.usual_service_id)!;
-      const t = sellableTimes(day, service.duration_min, { step: 30 }).find((x) => x.start >= day.now + 30);
+      const date = day.demo.demo_date;
+      const t = sellableTimes(day, service.duration_min, { step: 30 })
+        .map((x) => ({ start: x.start, chairs: x.chairs.filter((ch) => !clashes(ch, atMinutes(date, x.start), atMinutes(date, x.start + service.duration_min))) }))
+        .find((x) => x.start >= day.now + 30 && x.chairs.length);
       if (!t) continue;
       const o = await offerTo(day, c, t.start, t.chairs[0], 2);
       // If their first slot went to someone who paid sooner, say so in the activity log.
