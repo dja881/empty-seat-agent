@@ -248,7 +248,7 @@ begin
   insert into merchants (id, name, owner_name, city, area_id, stylists, opens_at, closes_at, max_discount,
     allowed_offers, never_discount_services, vip_customer_ids, daily_message_cap, quiet_hours_start,
     quiet_hours_end, approval_mode, front_desk_name, front_desk_phone, logo_url)
-  values ('${M}', 'Strand & Co.', 'Priya', 'Hyderabad', 'hyd-madhapur',
+  values ('${M}', 'Strand & Co.', 'Daivik', 'Hyderabad', 'hyd-madhapur',
     array['Anjali','Ravi','Meena','Farhan','Lakshmi','Arjun'], '10:00', '20:00', 200,
     array['pay_now','friend','pass'], array['svc_colour'], array[${vipIds.map(q).join(",")}], 60, '21:00', '09:00',
     'ask_first', 'Sneha', '+91 98480 55555', '/strand-mark.svg')

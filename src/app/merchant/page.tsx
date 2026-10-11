@@ -84,7 +84,7 @@ function Merchant() {
 
   const next = (() => {
     if (!data) return null;
-    if (stage === "idle") return { label: "Start my day", run: () => chat.wake() };
+    if (stage === "idle") return null; // the wake-up card is the only start button
     if (stage === "plan") return { label: "Approve plan", run: () => chat.approve() };
     const labels: Record<Stage, string> = { idle: "morning plan", plan: "morning plan", customers: "customers", live: "live sales", done: "live sales" };
     if (view !== stage && !(stage === "done" && view === "live")) return { label: `Back to ${labels[stage]}`, run: () => go(stage) };
@@ -129,7 +129,7 @@ function Merchant() {
                   <div className="w-[420px] rounded-2xl border border-line bg-surface p-6 text-center shadow-xl">
                     <Sun className="mx-auto h-8 w-8 text-[#f5b800]" />
                     <h2 className="mt-3 text-[22px] font-semibold text-ink">Good morning, {data.merchant.owner_name}</h2>
-                    <p className="mt-1 text-[14px] text-muted">{emptySlotCount(data.slots)} chairs are empty today, mostly after lunch.</p>
+                    <p className="mt-1 text-[14px] text-muted">{emptySlotCount(data.slots)} slots are empty today, mostly after lunch.</p>
                     <button onClick={() => chat.wake()} className="mt-5 inline-flex items-center gap-2 rounded-xl bg-accent px-5 py-3 text-[15px] font-semibold text-white shadow-sm hover:bg-[#1849d6]">
                       Start my day <ArrowRight className="h-4 w-4" />
                     </button>
@@ -155,7 +155,7 @@ function Merchant() {
             <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_350px]">
               <div className="min-w-0 space-y-3">
                 <AgentBar chat={chat} />
-                <PaneLabel title="Strand & Co.'s chairs" sub="What Priya sees. Offers go out, customers pay, chairs turn green." />
+                <PaneLabel title="Strand & Co.'s chairs" sub="What Daivik sees. Offers go out, customers pay, chairs turn green." />
                 <Calendar data={data} pxPerMin={0.85} />
                 <CalendarLegend />
                 <ActivityFeed events={events} limit={5} />
