@@ -2,7 +2,7 @@
 
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowRight, CheckCircle2, RotateCcw, Sun } from "lucide-react";
+import { ArrowRight, CheckCircle2, RotateCcw, Sun, TrendingDown } from "lucide-react";
 import { VoiceToggle } from "@/components/agent/VoiceToggle";
 import { AppShell } from "@/components/shell/AppShell";
 import { Calendar, CalendarLegend } from "@/components/Calendar";
@@ -154,6 +154,7 @@ function Merchant() {
           {view === "live" && (
             <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_350px]">
               <div className="min-w-0 space-y-3">
+                <FootfallAlert events={events} now={now} />
                 <AgentBar chat={chat} />
                 <PaneLabel title="Strand & Co.'s chairs" sub="What Daivik sees. Offers go out, customers pay, chairs turn green." />
                 <Calendar data={data} pxPerMin={0.85} />
@@ -192,6 +193,25 @@ function AgentBar({ chat }: { chat: ReturnType<typeof useAgentChat> }) {
         {last ? last.text : "Offers are out. I'll tell you when something changes."}
       </p>
       <div className="w-full md:w-[360px]"><AskBar chat={chat} placeholder="Ask RAY, e.g. how are we doing?" compact /></div>
+    </div>
+  );
+}
+
+/** The 1:30 pm moment: foot traffic is down, so RAY releases time he was holding. Shown for the next 90 minutes. */
+function FootfallAlert({ events, now }: { events: AgentEvent[]; now: number }) {
+  const e = events.find((x) => x.type === "footfall_alert");
+  if (!e) return null;
+  const at = istMinutes(e.clock_at ?? e.created_at);
+  if (now < at || now > at + 90) return null;
+  const p = e.payload as { pct?: number; start?: string; chair?: number };
+  return (
+    <div className="flex items-center gap-4 rounded-xl border border-[#f5b800] bg-[#fff8e1] px-5 py-4 shadow-sm" style={{ animation: "alert-in .5s ease" }}>
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#f5b800] text-white"><TrendingDown className="h-6 w-6" /></span>
+      <div className="min-w-0 leading-snug">
+        <div className="text-[17px] font-semibold text-ink">Foot traffic near you is {p.pct}% below normal</div>
+        <div className="text-[14px] text-ink-2">Walk-ins are unlikely to fill it, so RAY released the {p.start} slot on Chair {p.chair} and is offering it now.</div>
+      </div>
+      <style>{`@keyframes alert-in{from{opacity:0;transform:translateY(-10px) scale(.98)}to{opacity:1;transform:none}}`}</style>
     </div>
   );
 }

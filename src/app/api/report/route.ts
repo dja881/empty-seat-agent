@@ -67,6 +67,9 @@ export async function GET() {
   });
   const sum = (k: "rev" | "exp" | "fee" | "extra" | "paid" | "m" | "b") => bookings.reduce((s, a) => s + a[k], 0);
 
+  // The fee is charged on the day's booking revenue, so 8% of the total shown is the fee shown.
+  const dayFee = Math.round(sum("rev") * AGENT_FEE);
+
   const released = (plan?.releasedUnits ?? 22) + (events.some((e) => e.type === "footfall_alert") ? 1 : 0);
   const sentTo = new Set(offers.map((o) => `${o.customer_id}|${o.guest_name ?? ""}`)).size;
   const nearbyFill = Number((benchRes.data as { fill_rate: number } | null)?.fill_rate ?? 0.18);
@@ -96,7 +99,7 @@ export async function GET() {
     clock: timeLabel(day.now),
     bookings,
     totals: {
-      rev: sum("rev"), exp: sum("exp"), fee: sum("fee"), extra: sum("extra"), paid: sum("paid"), m: sum("m"), b: sum("b"),
+      rev: sum("rev"), exp: sum("exp"), fee: dayFee, extra: sum("rev") - sum("exp") - dayFee, paid: sum("paid"), m: sum("m"), b: sum("b"),
       bank: bookings.filter((x) => x.src === "bank offer").reduce((s, x) => s + x.b, 0),
       brand: bookings.filter((x) => x.src === "brand offer").reduce((s, x) => s + x.b, 0),
     },

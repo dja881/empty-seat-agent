@@ -113,8 +113,11 @@ export async function proposePlan(day: Day, signals: Signals, overrides: Partial
   // Open slots match the header count; whatever isn't released is left for walk-ins.
   const openUnits = emptySlotCount(day.slots as unknown as Slot[]);
   const heldUnits = openUnits - f.releasedUnits;
-  // Base case: about 30% of released time sells, at roughly ₹470 a slot after discount.
-  const expectedRevenue = Math.round((f.releasedUnits * 0.3 * 470) / 100) * 100;
+  // Base case at the full ₹200 cap: about 30% of released time sells, at roughly ₹470 a slot.
+  // A lower cap means fewer takers (down towards the 18% similar salons fill on their own),
+  // each paying a little more.
+  const reach = Math.min(1, maxDiscount / 200);
+  const expectedRevenue = Math.round((f.releasedUnits * (0.18 + 0.12 * reach) * (470 + (1 - reach) * 40)) / 100) * 100;
   return {
     status: overrides.status ?? prev?.status ?? "proposed",
     maxDiscount,
