@@ -55,7 +55,7 @@ export async function handleCustomerMessage(customerId: string, text: string) {
   const decided = day.demo.scripted ? null : await decide(day, customer, thread, open);
   const out = decided ?? scriptedReply(day, customer, text, open);
   if (!decided && !day.demo.scripted) console.warn("salon agent: model unavailable, used scripted reply");
-  return execute(day, customer, out, open, decided ? "model" : "script");
+  return execute(day, customer, out, open, decided ? "model" : "script", text);
 }
 
 /* ---------------- the LLM step ---------------- */
@@ -118,7 +118,10 @@ Reply with JSON only:
 
 /* ---------------- enforcement and side effects ---------------- */
 
-async function execute(day: Day, customer: CustomerRow, out: AgentOutput, open: OpenOffer[], by: "model" | "script") {
+// The price only comes down when the customer has raised price themselves.
+const ASKS_ABOUT_PRICE = /₹|\brs\b|rupee|price|pric[ey]|discount|cheap|expensive|cost|budget|afford|deal|lower|less|too much|best you can|\d{3}/i;
+
+async function execute(day: Day, customer: CustomerRow, out: AgentOutput, open: OpenOffer[], by: "model" | "script", text = "") {
   const action: Action = ACTIONS.includes(out.action) ? out.action : "hand_to_owner";
 
   if (action === "add_to_waitlist") {
@@ -156,8 +159,10 @@ async function execute(day: Day, customer: CustomerRow, out: AgentOutput, open: 
   const currentPrice = current?.price ?? service.price;
   let proposed = out.price ?? currentPrice;
   let steps = current?.price_steps ?? 0;
+  let heldPrice = false;
   if (proposed < currentPrice) {
-    if (steps >= 3) proposed = currentPrice;
+    if (!ASKS_ABOUT_PRICE.test(text)) { proposed = currentPrice; heldPrice = true; } // no unasked discounts
+    else if (steps >= 3) proposed = currentPrice;
     else { steps += 1; proposed = Math.max(proposed, currentPrice - 30); }
   }
   const { price, adjusted } = enforcePrice(day, service, proposed);
@@ -166,7 +171,7 @@ async function execute(day: Day, customer: CustomerRow, out: AgentOutput, open: 
   const partyChanged = out.party_size !== undefined && out.party_size !== party;
   let message = out.message;
   const brandFunded = anyFunding(day, price, service.id)?.kind === "brand";
-  if (adjusted || timeMoved || partyChanged || !message || brandFunded) {
+  if (adjusted || heldPrice || timeMoved || partyChanged || !message || brandFunded) {
     message = await rewrite(day, customer, { service, start: slot.start, price, party, original: out.message });
   }
 

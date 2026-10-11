@@ -26,7 +26,7 @@ Read `PROGRESS.md` first for where things stand. Update it after each step.
 ### Safety routine for every change
 1. Work on a git branch, never directly on `main`.
 2. Check with `npx tsc --noEmit` and `npm run lint`.
-3. Run `scripts/run-demo-day.sh` against the running dev server. It must end on 7 slots, ₹3,160, ₹200 partner-funded.
+3. Run `scripts/run-demo-day.sh` against the running dev server. It must print PASS (7 slots, ₹3,160, ₹200 partner-funded). Read the result before merging; chain the merge with `&&` after the script so a FAIL stops it.
 4. Merge to `main` and push only when that passes. Tag versions worth going back to (`working-glow-salon` is the last pre-rebrand one).
 5. Reset the demo afterwards (`POST /api/demo/reset`) so the user starts from a clean day.
 
@@ -48,6 +48,7 @@ Read `PROGRESS.md` first for where things stand. Update it after each step.
 - The owner can go back and forth between stages and close the day at any time.
 - The model proposes, code enforces: floor on what the salon receives, max discount, at most 3 price steps, sellable times only.
 - A plan change and a plan approval never happen in the same turn.
+- Sneha's price only comes down when the customer raises price. No unasked discounts.
 
 ### Working with the user
 - Ask questions in plain text, not with a question dialog.

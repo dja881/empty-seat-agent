@@ -20,3 +20,13 @@ p /api/demo/clock '{"to":"15:30","simulate":["call_me","walk_in"]}'
 p /api/demo/clock '{"to":"16:00","simulate":["walk_in","walk_in"]}'
 p /api/demo/clock '{"to":"17:00","simulate":["walk_in","walk_in"]}'
 p /api/demo/clock '{"to":"18:00","simulate":[]}'
+
+# Verdict: exits non-zero unless the day lands on the expected numbers, so it can gate a merge.
+curl -s "$B/api/report" | python3 -c "
+import sys, json
+r = json.load(sys.stdin); t = r['totals']
+got = (r['sold'], t['rev'], t['b'])
+print('RESULT sold=%s revenue=%s partner_funded=%s' % got)
+ok = got == (7, 3160, 200)
+print('PASS' if ok else 'FAIL: expected sold=7 revenue=3160 partner_funded=200')
+sys.exit(0 if ok else 1)"
