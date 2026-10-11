@@ -148,6 +148,10 @@ async function simulateSale(day: Day) {
       const t = sellableTimes(day, service.duration_min, { step: 30 }).find((x) => x.start >= day.now + 30);
       if (!t) continue;
       const o = await offerTo(day, c, t.start, t.chairs[0], 2);
+      // If their first slot went to someone who paid sooner, say so in the activity log.
+      const lost = must(await db.from("offers").select("start_at").eq("customer_id", id).eq("status", "cancelled")
+        .order("created_at", { ascending: false }).limit(1), "lost offer") as { start_at: string }[];
+      if (lost[0]) await logEvent("offer_moved", { customer: c.name, from: timeLabel(istMinutes(lost[0].start_at)), to: timeLabel(t.start) });
       offerId = o.id; customer = c;
       break;
     }

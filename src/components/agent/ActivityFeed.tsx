@@ -6,6 +6,7 @@ import { formatClockFull, istMinutes } from "@/lib/time";
 const BADGE: Record<string, [string, string]> = {
   paid: ["Captured", "bg-success-soft text-success"],
   offer_sent: ["Sent", "bg-background text-ink-2"],
+  offer_moved: ["New time", "bg-background text-ink-2"],
   reply: ["Replied", "bg-accent-soft text-accent"],
   footfall_alert: ["Released", "bg-accent-soft text-accent"],
   call_me: ["Call me", "bg-warn-soft text-warn"],
@@ -30,6 +31,7 @@ function describe(e: AgentEvent): string | null {
       return `${p.customer} · ${when} chair ${p.chair} · ₹${p.amount}${funded}${p.simulated ? "" : " via Razorpay"}`;
     }
     case "offer_sent": return p.wave ? `Wave ${p.wave} sent to ${p.count} customers` : `Offer to ${p.customer}: ${p.time}, ₹${p.price}${Number(p.party) > 1 ? ` × ${p.party}` : ""}`;
+    case "offer_moved": return `${p.customer}'s ${p.from} slot was taken. Offered ${p.to} instead`;
     case "reply": return `${p.customer}: “${String(p.text).slice(0, 70)}”`;
     case "footfall_alert": return String(p.text);
     case "call_me": return `${p.customer} asked for a call`;

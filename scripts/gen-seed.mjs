@@ -30,7 +30,7 @@ const C = [
   // Due occasional customers: the agent's real audience
   ["c_riya", "Riya Reddy", "target", 1.2, 42, 35, "afternoon", "svc_haircut", 520, 0.75, "HDFC"],
   ["c_aditya", "Aditya Rao", "target", 0.8, 38, 30, "afternoon", "svc_haircut", 480, 0.5, "ICICI"],
-  ["c_sneha_k", "Sneha Kulkarni", "target", 2.1, 50, 42, "afternoon", "svc_spa", 1250, 0.45, "HDFC"],
+  ["c_sneha_k", "Shreya Kulkarni", "target", 2.1, 50, 42, "afternoon", "svc_spa", 1250, 0.45, "HDFC"],
   ["c_imran", "Imran Shaikh", "target", 1.5, 27, 21, "afternoon", "svc_beard", 260, 0.55, null],
   ["c_pooja", "Pooja Menon", "target", 3.0, 47, 40, "afternoon", "svc_haircut", 470, 0.4, "SBI"],
   ["c_karthik", "Karthik Varma", "target", 1.9, 33, 28, "afternoon", "svc_haircut", 450, 0.35, "HDFC"],
