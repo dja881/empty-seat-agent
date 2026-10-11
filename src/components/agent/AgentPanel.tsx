@@ -39,6 +39,16 @@ export function AgentPanel({ chat, plan, ownerName, asleep }: { chat: Chat; plan
         {chat.interim && <p className="pl-10 text-right text-[14px] italic text-muted">{chat.interim}</p>}
 
         {plan && briefed && (
+          <div className="mt-2 rounded-lg border border-line bg-background/60 px-3 py-2.5 text-[13px] leading-snug text-ink" style={{ animation: "fade-up .4s ease both" }}>
+            <div className="mb-1.5 text-[11.5px] text-muted">
+              Based on Razorpay network signals{plan.signalMerchants ? ` · aggregated from ${plan.signalMerchants} nearby businesses` : ""}
+            </div>
+            <div>Payments nearby: {plan.footfallPct < 0 ? `${Math.abs(plan.footfallPct)}% below a normal Tuesday` : "about normal for a Tuesday"}</div>
+            <div className="mt-1">Nearby salons: {plan.salonsPct <= -10 ? "quieter than usual" : "about as busy as usual"}</div>
+            {plan.typicalDiscount && <div className="mt-1">Offers in this area work at about ₹{plan.typicalDiscount} off a haircut</div>}
+          </div>
+        )}
+        {plan && briefed && (
           <div className="mt-2 overflow-hidden rounded-lg border border-line">
             {[
               ["Offer", <b key="o" className="tnum">{plan.releasedUnits} empty slots</b>],

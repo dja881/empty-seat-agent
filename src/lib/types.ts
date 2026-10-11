@@ -61,6 +61,8 @@ export interface Plan {
   excludedServices: string[];
   keepOpen: string[];
   firstWaveAt: string;
+  signalMerchants?: number;     // nearby businesses behind the payment signal
+  typicalDiscount?: number;     // discount that filled same-day afternoon haircuts nearby
   history: { from: string; text: string }[];
 }
 

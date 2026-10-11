@@ -32,6 +32,8 @@ export interface Plan {
   excludedServices: string[];
   keepOpen: string[];           // times the owner asked to keep for walk-ins, "16:00"
   firstWaveAt: string;          // "11:30"
+  signalMerchants?: number;     // nearby businesses behind the payment signal
+  typicalDiscount?: number;     // discount that filled same-day afternoon haircuts nearby
   history: { from: string; text: string }[];
 }
 

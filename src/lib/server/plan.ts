@@ -117,6 +117,8 @@ export async function proposePlan(day: Day, signals: Signals, overrides: Partial
   // A lower cap means fewer takers (down towards the 18% similar salons fill on their own),
   // each paying a little more.
   const reach = Math.min(1, maxDiscount / 200);
+  const bench = await db.from("network_benchmarks").select("median_discount_that_filled")
+    .eq("city", "Hyderabad").eq("service", "Haircut").eq("day_part", "afternoon").eq("lead_time", "same_day").maybeSingle();
   const expectedRevenue = Math.round((f.releasedUnits * (0.18 + 0.12 * reach) * (470 + (1 - reach) * 40)) / 100) * 100;
   return {
     status: overrides.status ?? prev?.status ?? "proposed",
@@ -128,6 +130,8 @@ export async function proposePlan(day: Day, signals: Signals, overrides: Partial
     expectedRevenue,
     footfallPct: pct(signals.nearby),
     salonsPct: pct(signals.salons),
+    signalMerchants: signals.merchants,
+    typicalDiscount: bench.data?.median_discount_that_filled ?? undefined,
     heldHours: f.heldHours,
     excludedServices: overrides.excludedServices ?? prev?.excludedServices ?? [],
     keepOpen,
