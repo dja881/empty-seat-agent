@@ -7,7 +7,7 @@ import { chairRole } from "@/lib/brand";
 
 interface Row {
   customerId: string; serviceId: string; start: number; name: string; reasons: string[]; service: string; duration: number;
-  time: string; chair: number; stylist: string; price: number; list: number; hdfc: boolean; status?: string;
+  time: string; chair: number; stylist: string; price: number; list: number; partner: { text: string; pays: number; kind: "bank" | "brand" } | null; status?: string;
 }
 interface Preview { checked: number; eligible: number; excludedCounts: Record<string, number>; rows: Row[]; sent?: boolean }
 
@@ -98,8 +98,8 @@ export function WaveView({ mode, alreadySent, trigger, onSending, onDone }: {
                     <td className="px-3 py-2.5"><span className="tnum block font-medium text-ink">{r.time}</span><span className="block text-[12px] text-muted">Chair {r.chair} · {chairRole(r.chair)}</span></td>
                     <td className="px-3 py-2.5 text-[12.5px] text-ink-2">{r.reasons.join(" · ")}</td>
                     <td className="px-3 py-2.5 text-right">
-                      <span className="tnum block font-semibold text-ink">{rupees(r.price)}</span>
-                      <span className="block text-[12px] text-muted">{r.hdfc ? `₹${r.price - 50} on HDFC` : <span className="line-through">{rupees(r.list)}</span>}</span>
+                      <span className="tnum block font-semibold text-ink">{rupees(r.partner?.pays ?? r.price)}</span>
+                      <span className="block text-[12px] text-muted">{r.partner ? r.partner.text : <span className="line-through">{rupees(r.list)}</span>}</span>
                     </td>
                     <td className="px-4 py-2.5 text-[12px]">
                       {st === "sending" && <span className="flex items-center gap-1 text-accent"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Sending</span>}
@@ -131,8 +131,8 @@ export function WaveView({ mode, alreadySent, trigger, onSending, onDone }: {
               <div className="text-[13px] font-semibold text-ink">The message</div>
               <div className="mt-3 rounded-lg bg-[#efeae2] p-3">
                 <div className="rounded-lg rounded-tl-none bg-white p-2.5 text-[12.5px] leading-snug text-[#111b21] shadow-sm">
-                  Hi {preview.name.split(" ")[0]}, this is Sneha from Strand & Co. It&apos;s been 6 weeks since your last {preview.service.toLowerCase()}. {preview.time} today: ₹{preview.price} if you pay now{preview.hdfc ? `, or ₹${preview.price - 50} with an HDFC card` : ""}. Usually ₹{preview.list}. Tap to call me anytime.
-                  <div className="mt-2 border-t border-[#e9edef] pt-1.5 text-center font-medium text-[#027eb5]">Pay ₹{preview.price}</div>
+                  Hi {preview.name.split(" ")[0]}, this is Sneha from Strand & Co. It&apos;s been 6 weeks since your last {preview.service.toLowerCase()}. {preview.time} today: {preview.partner?.kind === "brand" ? `₹${preview.partner.pays} if you pay now, with ${preview.partner.text.replace(" pays ", " paying ")}` : `₹${preview.price} if you pay now${preview.partner ? `, or ${preview.partner.text.replace(" on ", " with an ")} card` : ""}`}. Usually ₹{preview.list}. Tap to call me anytime.
+                  <div className="mt-2 border-t border-[#e9edef] pt-1.5 text-center font-medium text-[#027eb5]">Pay ₹{preview.partner?.pays ?? preview.price}</div>
                 </div>
               </div>
               <p className="mt-2 text-[12px] text-muted">Approved WhatsApp template, with Call Sneha and opt-out.</p>

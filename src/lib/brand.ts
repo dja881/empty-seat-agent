@@ -1,5 +1,8 @@
 // The demo merchant's brand, in one place. Screens read from here; the database row
 // (merchants.name) carries the same name for messages the agent writes.
+// The agent is Ray, Razorpay's agent; filling empty seats is the job it does for this merchant.
+export const AGENT_NAME = "Ray";
+
 export const BRAND = {
   name: "Strand & Co.",
   descriptor: "Hair Studio · Hyderabad",

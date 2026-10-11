@@ -20,6 +20,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
     chair: o.chair,
     price: o.price,
     funded: o.funded_amount,
+    funderKind: o.funder_kind,
     funder: o.funder,
     salon: { name: day.merchant.name, frontDesk: day.merchant.front_desk_name, phone: day.merchant.front_desk_phone },
     alternatives: open ? [] : alternatives(day, o),

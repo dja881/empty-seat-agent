@@ -2,6 +2,12 @@ import { NextResponse } from "next/server";
 import { loadDay } from "@/lib/server/day";
 import { finishWave, previewWave, sendOne, sendWave, setClock } from "@/lib/server/waves";
 import { timeLabel } from "@/lib/server/day";
+import { fundingFor, type Funding } from "@/lib/server/pricing";
+
+/** "₹330 on HDFC" or "₹1,000 · L'Oréal pays ₹100": how the partner offer changes this customer's price. */
+const partnerNote = (f: Funding | null, price: number) =>
+  !f ? null : f.kind === "brand" ? { text: `${f.funder.split(" ")[0]} pays ₹${f.amount}`, pays: price - f.amount, kind: f.kind }
+    : { text: `₹${price - f.amount} on ${f.issuer}`, pays: price, kind: f.kind };
 
 /** GET: who wave 1 goes to and why. POST {wave, clock?}: send it (demo mode can jump the clock first). */
 export async function GET(req: Request) {
@@ -24,7 +30,7 @@ export async function GET(req: Request) {
       stylist: day.merchant.stylists[r.chair - 1],
       price: r.price,
       list: r.service.price,
-      hdfc: r.candidate.customer.card_issuer === "HDFC",
+      partner: partnerNote(fundingFor(day, r.candidate.customer, r.price, r.service.id), r.price),
     })),
   });
 }
@@ -64,7 +70,7 @@ async function sentWave(day: Awaited<ReturnType<typeof loadDay>>) {
       customerId: o.customer_id, serviceId: o.service_id, start: istMinutes(o.start_at), name: o.customers.name,
       reasons: reasons.get(o.customer_id) ?? [], score: 0, service: o.services.name, duration: o.services.duration_min,
       time: timeLabel(istMinutes(o.start_at)), chair: o.chair, stylist: day.merchant.stylists[o.chair - 1],
-      price: o.price, list: o.list_price, hdfc: o.customers.card_issuer === "HDFC", status,
+      price: o.price, list: o.list_price, partner: partnerNote(fundingFor(day, o.customers, o.price, o.service_id), o.price), status,
     };
   });
   return { checked: customers.length, eligible: rows.length, excludedCounts: {}, rows, sent: true };

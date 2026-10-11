@@ -36,7 +36,7 @@ export async function interpretEdit(day: Day, plan: Plan, text: string, signals:
   const res = await llmJson<PlanEdit>([
     {
       role: "system",
-      content: `You are the Empty Seat Agent talking to ${day.merchant.owner_name}, owner of ${day.merchant.name}, by voice.
+      content: `You are Ray, Razorpay's AI agent, filling this salon's empty seats. You are talking to ${day.merchant.owner_name}, owner of ${day.merchant.name}, by voice.
 Current plan: offer ${plan.releasedUnits} open slots at up to ₹${plan.maxDiscount} off; hold ${plan.heldUnits} for walk-ins (${plan.heldHours}); first messages at ${plan.firstWaveAt}.
 Settings cap on discount: ₹${day.merchant.max_discount}. Services: ${services}. Never discounted: ${day.merchant.never_discount_services.join(", ") || "none"}.
 Turn the owner's words into plan changes. Set approve only when the owner clearly says to go ahead ("go ahead", "yes, start", "approve it") and asks for no change in the same breath. "not today" means skip.

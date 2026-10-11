@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 import { db, logEvent, must } from "./db";
 import { loadDay, parseHHMM, sellableTimes, timeLabel, type CustomerRow, type Day, type ServiceRow } from "./day";
 import { llmJson, type ChatMessage } from "./llm";
-import { anyFunding, enforcePrice, limitsFor } from "./pricing";
+import { anyFunding, enforcePrice, limitsFor, priceLine } from "./pricing";
 import { cancelOpenOffers, createOffer, postMessage, refreshOffered, type LinkButton } from "./offers";
 import { istMinutes } from "../time";
 
@@ -74,10 +74,11 @@ async function decide(day: Day, customer: CustomerRow, thread: { sender: string;
       `. Open times today (chairs free): ${times || "none"}`;
   }).join("\n");
 
-  const funding = anyFunding(day, current?.price ?? usual.price);
+  const funding = anyFunding(day, current?.price ?? usual.price, usual.id);
   const offerLine = current
     ? `Current offer: ${svc(current.service_id).name} at ${timeLabel(istMinutes(current.start_at))}, ₹${current.price}` +
-      (funding ? ` (₹${current.price - funding.amount} with an ${funding.issuer} card, bank pays ₹${funding.amount})` : "") +
+      (funding?.kind === "brand" ? ` to the salon; the customer pays ₹${current.price - funding.amount} because ${funding.funder} funds ₹${funding.amount}`
+        : funding ? ` (₹${current.price - funding.amount} with an ${funding.issuer} card, bank pays ₹${funding.amount})` : "") +
       `, price steps used ${current.price_steps} of 3, seats ${open.length}.`
     : "No open offer.";
 
@@ -96,7 +97,9 @@ ${menu}
 Rules:
 - Only offer times listed above, and a party only if that many chairs are free then.
 - Never go below "lowest you may go". Lower the price at most one step (₹10 to ₹30) per reply and at most 3 times in total. Prefer asking for a commitment instead of a discount: pay now to lock the slot, a different time, or bring a friend (each pays their own share).
-- A bank offer gives ₹${funding?.amount ?? 50} off on ${funding?.issuer ?? "HDFC"} cards at checkout; mention it when relevant.
+- ${funding?.kind === "brand"
+      ? `${funding.funder} funds ₹${funding.amount} off this service on any payment method. Quote the customer the price minus ₹${funding.amount}; the "price" in your JSON stays what the salon receives.`
+      : `A bank offer gives ₹${funding?.amount ?? 50} off on ${funding?.issuer ?? "HDFC"} cards at checkout; mention it when relevant.`}
 - Payment links are attached automatically to any offer you make; say "here's the link" or "here are both links".
 - If they ask for something you can't do, want to talk, or complain, use alert_front_desk and say you'll call them.
 - If the time they want is taken, offer the nearest open time or add_to_waitlist.
@@ -162,7 +165,8 @@ async function execute(day: Day, customer: CustomerRow, out: AgentOutput, open: 
   const timeMoved = slot.start !== wanted;
   const partyChanged = out.party_size !== undefined && out.party_size !== party;
   let message = out.message;
-  if (adjusted || timeMoved || partyChanged || !message) {
+  const brandFunded = anyFunding(day, price, service.id)?.kind === "brand";
+  if (adjusted || timeMoved || partyChanged || !message || brandFunded) {
     message = await rewrite(day, customer, { service, start: slot.start, price, party, original: out.message });
   }
 
@@ -177,7 +181,8 @@ async function execute(day: Day, customer: CustomerRow, out: AgentOutput, open: 
       customer, service, chair: slot.chairs[seat], start: slot.start, end: slot.start + service.duration_min,
       price, wave: current ? 2 : 1, guestName: seat === 0 ? null : guest, groupId, steps,
     });
-    links.push({ offer_id: offer.id, label: party > 1 ? `${seat === 0 ? first(customer.name) : guest} · Pay ₹${price}` : `Pay ₹${price}` });
+    const pay = price - (brandFunded ? offer.funded_amount : 0);
+    links.push({ offer_id: offer.id, label: party > 1 ? `${seat === 0 ? first(customer.name) : guest} · Pay ₹${pay}` : `Pay ₹${pay}` });
   }
   await db.from("offers").update({ status: "link_sent" }).in("id", links.map((l) => l.offer_id));
   await refreshOffered();
@@ -187,9 +192,8 @@ async function execute(day: Day, customer: CustomerRow, out: AgentOutput, open: 
 
 /** Second pass when code changed what the agent proposed: say exactly what will be sent. */
 async function rewrite(day: Day, customer: CustomerRow, f: { service: ServiceRow; start: number; price: number; party: number; original?: string }) {
-  const funding = anyFunding(day, f.price);
-  const facts = `${f.party > 1 ? `${f.party} people, ` : ""}${f.service.name} at ${timeLabel(f.start)} today, ₹${f.price}${f.party > 1 ? " each" : ""}` +
-    (funding ? `, or ₹${f.price - funding.amount} with an ${funding.issuer} card` : "");
+  const funding = anyFunding(day, f.price, f.service.id);
+  const facts = `${f.party > 1 ? `${f.party} people, ` : ""}${f.service.name} at ${timeLabel(f.start)} today, ${priceLine(f.price, funding, f.party > 1)}`;
   const res = await llmJson<{ message: string }>([
     { role: "system", content: `You are ${day.merchant.front_desk_name} at ${day.merchant.name} on WhatsApp. Rewrite the draft so it states exactly these facts and nothing else about price or time: ${facts}. Mention the payment link${f.party > 1 ? "s" : ""}. 1 to 2 short sentences, no emojis. JSON: {"message": "..."}` },
     { role: "user", content: f.original || "(no draft)" },
@@ -204,8 +208,7 @@ function scriptedReply(day: Day, customer: CustomerRow, text: string, open: Open
   const t = text.toLowerCase();
   const current = open.find((o) => !o.guest_name) ?? open[0];
   const price = current?.price ?? 380;
-  const funding = anyFunding(day, price);
-  const bank = funding ? `, or ₹${price - funding.amount} with an ${funding.issuer} card` : "";
+  const funding = anyFunding(day, price, current?.service_id ?? customer.usual_service_id);
   const friend = /sister|brother|friend|wife|husband|two of us|2 of us/.test(t);
   const timeMatch = t.match(/\b(1[0-2]|[1-9])(?::(\d\d))?\s*(am|pm)?\b/);
   if (timeMatch || friend) {
@@ -216,8 +219,8 @@ function scriptedReply(day: Day, customer: CustomerRow, text: string, open: Open
       action: friend ? "add_friend" : "offer_other_time", time, party_size: friend ? 2 : 1, price,
       service_id: current?.service_id ?? customer.usual_service_id,
       message: friend
-        ? `Yes, ${timeLabel(parseHHMM(time))} for two. ₹${price} each${bank}. Here are both links.`
-        : `Yes, ${timeLabel(parseHHMM(time))} works. ₹${price}${bank}. Here's the link.`,
+        ? `Yes, ${timeLabel(parseHHMM(time))} for two. ${priceLine(price, funding, true)}. Here are both links.`
+        : `Yes, ${timeLabel(parseHHMM(time))} works. ${priceLine(price, funding)}. Here's the link.`,
     };
   }
   if (/call|talk|speak/.test(t)) return { action: "alert_front_desk", message: `Sure, I'll call you in a few minutes. ${day.merchant.front_desk_name}` };

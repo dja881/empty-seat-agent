@@ -18,7 +18,7 @@ export async function GET() {
   const seen = new Set<string>();
   const rows = offers.filter((o) => { const k = `${o.customer_id}|${o.guest_name}`; if (seen.has(k)) return false; seen.add(k); return true; })
     .map((o) => ({
-      id: o.id, customer: o.guest_name ?? o.customers.name, customerId: o.customer_id, sub: o.guest_name ? `${o.customers.name.split(" ")[0]}'s guest` : `Wave ${o.wave}${o.funded_amount ? " · HDFC offer" : ""}`,
+      id: o.id, customer: o.guest_name ?? o.customers.name, customerId: o.customer_id, sub: o.guest_name ? `${o.customers.name.split(" ")[0]}'s guest` : `Wave ${o.wave}${o.funded_amount ? " · partner offer" : ""}`,
       service: o.services.name, start: istMinutes(o.start_at), chair: o.chair, stylist: day.merchant.stylists[o.chair - 1],
       price: o.price, status: callFor.has(o.customer_id) && o.status !== "paid" ? "call_me" : o.status === "link_sent" && replied.has(o.customer_id) ? "replied" : o.status,
     }));
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     await db.from("offers").update({ status: "link_sent" }).eq("id", o.id);
     await postMessage(day, o.customer_id, "front_desk",
       `Hi, Sneha here from the front desk. Here's the link for ${o.services?.name.toLowerCase()} at the same price, ₹${o.price}.`,
-      { links: [{ offer_id: o.id, label: `Pay ₹${o.price}` }] });
+      { links: [{ offer_id: o.id, label: `Pay ₹${o.price - (o.funder_kind === "brand" ? o.funded_amount : 0)}` }] });
     await refreshOffered();
     await logEvent("front_desk_link", { customer: o.guest_name ?? o.customers?.name });
     return NextResponse.json({ ok: true });

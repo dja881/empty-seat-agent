@@ -15,7 +15,7 @@ const WEEKDAYS_LEFT = 13;          // 14 to 30 Oct
 
 interface OfferRow {
   id: string; status: string; customer_id: string; guest_name: string | null; chair: number; start_at: string;
-  list_price: number; price: number; funded_amount: number; merchant_net: number; funder: string | null;
+  list_price: number; price: number; funded_amount: number; merchant_net: number; funder: string | null; funder_kind: string | null;
   customers: { name: string; last_visit_at: string; usual_gap_days: number } | null; services: { name: string } | null;
 }
 
@@ -60,9 +60,9 @@ export async function GET() {
     return {
       name: shortName(o.guest_name ?? o.customers?.name ?? "Customer"),
       service: o.services?.name ?? "", chair: `Chair ${o.chair}`, time: timeLabel(istMinutes(o.start_at)),
-      list: o.list_price, m, b, src: b ? "bank offer" : "", p, why,
+      list: o.list_price, m, b, src: !b ? "" : o.funder_kind === "brand" ? "brand offer" : "bank offer", funder: b ? o.funder : null, p, why,
       rev, exp, fee, extra: rev - exp - fee, paid: rev - b,
-      pay: pay?.status === "front_desk" ? "At the counter" : b ? "Card" : "UPI",
+      pay: pay?.status === "front_desk" ? "At the counter" : b && o.funder_kind !== "brand" ? "Card" : "UPI",
     };
   });
   const sum = (k: "rev" | "exp" | "fee" | "extra" | "paid" | "m" | "b") => bookings.reduce((s, a) => s + a[k], 0);
@@ -95,7 +95,11 @@ export async function GET() {
   return NextResponse.json({
     clock: timeLabel(day.now),
     bookings,
-    totals: { rev: sum("rev"), exp: sum("exp"), fee: sum("fee"), extra: sum("extra"), paid: sum("paid"), m: sum("m"), b: sum("b") },
+    totals: {
+      rev: sum("rev"), exp: sum("exp"), fee: sum("fee"), extra: sum("extra"), paid: sum("paid"), m: sum("m"), b: sum("b"),
+      bank: bookings.filter((x) => x.src === "bank offer").reduce((s, x) => s + x.b, 0),
+      brand: bookings.filter((x) => x.src === "brand offer").reduce((s, x) => s + x.b, 0),
+    },
     sold: bookings.length, released, notConverted: Math.max(0, sentTo - bookings.length),
     nearbyTypical: Math.round(nearbyFill * released),
     openSlots: emptySlotCount(day.slots as unknown as Slot[]),

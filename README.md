@@ -2,7 +2,7 @@
 
 Razorpay × ISB AI PM Build Challenge, Track 2 (Recover and Grow with AI).
 
-An AI growth agent that sells a salon's unfilled chair time to its own customers, the way airlines
+Ray, Razorpay's AI agent, running an empty-seat skill: it sells a salon's unfilled chair time to its own customers, the way airlines
 sell their last seats. It agrees a plan with the owner each morning, sends one-to-one offers in the
 receptionist's name, negotiates within the owner's limits, and locks each slot the moment the
 customer pays through Razorpay.
@@ -45,5 +45,5 @@ npm run dev
 | Browser speech recognition | Merchant's spoken replies | Real |
 | WhatsApp interface | Customer conversation | Simulated in a phone view |
 | Booking connector | Bookings, customers, walk-ins | Simulated with synthetic data |
-| Synthetic dataset | One 6-chair salon, 60 customers, 90 days of history, ~52 merchants' hourly payments, one bank offer | Synthetic |
+| Synthetic dataset | One 6-chair salon, 60 customers, 90 days of history, ~52 merchants' hourly payments, one bank offer (HDFC) and one brand offer (L'Oréal, illustrative) | Synthetic |
 | Claude Code | Research, PRD, prototype code | See BUILD_LOG.md |

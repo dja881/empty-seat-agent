@@ -9,7 +9,7 @@ import { useDemoClock } from "@/lib/useDemoClock";
 
 interface OfferView {
   id: string; status: string; open: boolean; customer: string; phone: string; service: string;
-  start: number; stylist: string; chair: number; price: number; funded: number; funder: string | null;
+  start: number; stylist: string; chair: number; price: number; funded: number; funder: string | null; funderKind: "bank" | "brand" | null;
   salon: { name: string; frontDesk: string; phone: string };
   alternatives: { start: number; label: string; stylist: string; price: number }[];
 }
@@ -46,7 +46,7 @@ function PayView({ offerId }: { offerId: string }) {
     if (!res.ok) { setStage("error"); setMessage("This link isn't valid any more."); return; }
     const o: OfferView = await res.json();
     setOffer(o);
-    if (o.funded > 0) setVariant("bank");
+    if (o.funded > 0 && o.funderKind !== "brand") setVariant("bank");
     if (o.status === "paid") setStage("done");
     else if (!o.open) setStage("taken");
   }, [offerId]);
@@ -104,7 +104,8 @@ function PayView({ offerId }: { offerId: string }) {
     } else load();
   }
 
-  const amount = offer ? offer.price - (variant === "bank" ? offer.funded : 0) : 0;
+  const brand = offer?.funderKind === "brand" && offer.funded > 0;
+  const amount = offer ? offer.price - (brand || variant === "bank" ? offer.funded : 0) : 0;
 
   return (
     <PhoneFrame clock={clock?.clock_at}>
@@ -146,13 +147,15 @@ function PayView({ offerId }: { offerId: string }) {
 
             <div className="rounded-xl border border-[#eaecf0] bg-white">
               <div className="px-4 pt-3 text-[12px] font-medium uppercase tracking-wide text-[#667085]">Pay with</div>
-              {offer.funded > 0 && (
+              {offer.funded > 0 && !brand && (
                 <Option selected={variant === "bank"} onClick={() => setVariant("bank")} icon={<CreditCard className="h-5 w-5" />}
                   title="HDFC Bank credit or debit card" price={offer.price - offer.funded} strike={offer.price}
                   note={<span className="flex items-center gap-1 text-[#067647]"><Tag className="h-3.5 w-3.5" /> ₹{offer.funded} off, paid by HDFC Bank</span>} />
               )}
               <Option selected={variant === "any"} onClick={() => setVariant("any")} icon={<Smartphone className="h-5 w-5" />}
-                title="UPI, any card or netbanking" price={offer.price} note={<span className="text-[#667085]">GPay, PhonePe, Paytm and more</span>} />
+                title="UPI, any card or netbanking" price={brand ? offer.price - offer.funded : offer.price} strike={brand ? offer.price : undefined} note={brand
+                  ? <span className="flex items-center gap-1 text-[#067647]"><Tag className="h-3.5 w-3.5" /> ₹{offer.funded} off, paid by {offer.funder}</span>
+                  : <span className="text-[#667085]">GPay, PhonePe, Paytm and more</span>} />
             </div>
 
             <p className="px-1 text-[12.5px] leading-snug text-[#667085]">

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/server/db";
 
 // Free-tier ElevenLabs keys can't use library voices; fall back to a built-in one.
-const FALLBACK_VOICE = "EXAVITQu4vr4xnSDxMaL"; // Sarah
+const FALLBACK_VOICE = "nPczCjzI2devNBz1zQrb"; // Brian: Ray's voice
 
 async function tts(text: string, voice: string) {
   return fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voice}?output_format=mp3_44100_64`, {

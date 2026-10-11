@@ -26,7 +26,7 @@ function describe(e: AgentEvent): string | null {
   switch (e.type) {
     case "paid": {
       const when = p.start_at ? label(istMinutes(String(p.start_at))) : "";
-      const funded = Number(p.funded) > 0 ? ` + ₹${p.funded} HDFC` : "";
+      const funded = Number(p.funded) > 0 ? ` + ₹${p.funded} partner-funded` : "";
       return `${p.customer} · ${when} chair ${p.chair} · ₹${p.amount}${funded}${p.simulated ? "" : " via Razorpay"}`;
     }
     case "offer_sent": return p.wave ? `Wave ${p.wave} sent to ${p.count} customers` : `Offer to ${p.customer}: ${p.time}, ₹${p.price}${Number(p.party) > 1 ? ` × ${p.party}` : ""}`;

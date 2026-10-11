@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { loadDay } from "@/lib/server/day";
-import { getOffer, settle } from "@/lib/server/settle";
+import { fundedFor, getOffer, settle } from "@/lib/server/settle";
 
 /**
  * Demo mode only: a simulated customer pays an offer through the same settlement path as a
@@ -11,7 +11,7 @@ export async function POST(req: Request) {
   const day = await loadDay();
   if (day.demo.mode !== "demo") return NextResponse.json({ error: "demo mode only" }, { status: 403 });
   const o = await getOffer(offerId);
-  const funded = variant === "bank" ? o.funded_amount : 0;
+  const funded = fundedFor(o, variant);
   const { result } = await settle(offerId, { orderId: null, paymentId: null, amount: o.price - funded, funded, simulated: true });
   return NextResponse.json({ result });
 }

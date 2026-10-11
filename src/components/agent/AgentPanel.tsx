@@ -26,7 +26,7 @@ export function AgentPanel({ chat, plan, ownerName, asleep }: { chat: Chat; plan
       <div className="flex items-center gap-3 border-b border-line px-4 py-3">
         <AgentOrb state={asleep ? "asleep" : chat.state} size={34} />
         <div className="min-w-0 flex-1">
-          <div className="text-[14px] font-semibold text-ink">Empty Seat Agent</div>
+          <div className="text-[14px] font-semibold text-ink">Ray</div>
           <div className="text-[12px] text-muted">
             {asleep ? "Asleep · tap Start my day" : chat.state === "listening" ? "Listening…" : chat.state === "speaking" ? "Speaking" : chat.state === "thinking" ? "Thinking…" : plan?.status === "approved" ? "Running today" : "Waiting for you"}
           </div>
@@ -61,7 +61,7 @@ export function AgentPanel({ chat, plan, ownerName, asleep }: { chat: Chat; plan
           <button onClick={chat.approve} className="w-full rounded-lg bg-accent py-2.5 text-[14px] font-semibold text-white hover:bg-[#1849d6]">Approve plan</button>
         </div>
       )}
-      {!asleep && <AskBar chat={chat} placeholder={plan?.status === "approved" ? "Ask your agent anything" : "Say or type a change, e.g. make it ₹100"} />}
+      {!asleep && <AskBar chat={chat} placeholder={plan?.status === "approved" ? "Ask Ray anything" : "Say or type a change, e.g. make it ₹100"} />}
       <style>{`@keyframes fade-up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}`}</style>
     </div>
   );
@@ -82,7 +82,7 @@ function Bubble({ line, owner }: { line: Line; owner: string }) {
   const shown = Math.ceil(words.length * Math.min(1, (line.reveal ?? 1) * 1.08));
   return (
     <div className="max-w-[92%]">
-      <div className="mb-0.5 text-[11px] text-faint">Agent</div>
+      <div className="mb-0.5 text-[11px] text-faint">Ray</div>
       <p className="text-[14.5px] leading-relaxed text-ink">
         {words.slice(0, shown).join(" ")}
         {shown < words.length && <span className="text-faint"> {words.slice(shown).join(" ")}</span>}

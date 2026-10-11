@@ -107,9 +107,9 @@ async function offerTo(day: Day, c: CustomerRow, start: number, chair: number, w
   const service = day.services.find((s) => s.id === c.usual_service_id)!;
   const bench = await benchmarks();
   const price = openingPrice(day, service, bench(service.name)?.median_discount_that_filled ?? 50);
-  const { offer } = await createOffer(day, { customer: c, service, chair, start, end: start + service.duration_min, price, wave });
+  const { offer, funding } = await createOffer(day, { customer: c, service, chair, start, end: start + service.duration_min, price, wave });
   await postMessage(day, c.id, "salon", openerText(day, c, service, start, price), {
-    template: "slot_offer_v2", links: [{ offer_id: offer.id, label: `Pay ₹${price}` }], call_button: true,
+    template: "slot_offer_v2", links: [{ offer_id: offer.id, label: `Pay ₹${price - (funding?.kind === "brand" ? funding.amount : 0)}` }], call_button: true,
   });
   return offer;
 }
@@ -117,7 +117,7 @@ async function offerTo(day: Day, c: CustomerRow, start: number, chair: number, w
 /* ---------------- simulator (demo mode only) ---------------- */
 
 // Simulated customers who buy during the 2 to 6 pm fast-forward, in order. Chosen so the
-// demo day lands on the PRD's base case: 7 slots, about ₹3,100, ₹150 funded by HDFC.
+// demo day lands on the PRD's base case: 7 slots, about ₹3,100, with part of the discount funded by partners.
 const SIM_BUYERS = ["c_sneha_k", "c_aditya", "c_divya", "c_imran", "c_pooja", "c_vikram", "c_karthik"];
 const DAY_TARGET = 7;
 
@@ -159,8 +159,9 @@ async function simulateSale(day: Day) {
 }
 
 async function amounts(offerId: string, bank: boolean) {
-  const o = must(await db.from("offers").select("price, funded_amount").eq("id", offerId).single(), "offer") as { price: number; funded_amount: number };
-  const funded = bank ? o.funded_amount : 0;
+  const o = must(await db.from("offers").select("price, funded_amount, funder_kind").eq("id", offerId).single(), "offer") as { price: number; funded_amount: number; funder_kind: string | null };
+  // A brand offer always applies; a bank offer only when the simulated customer pays with that card.
+  const funded = o.funder_kind === "brand" || bank ? o.funded_amount : 0;
   return { amount: o.price - funded, funded };
 }
 

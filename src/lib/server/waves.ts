@@ -53,11 +53,11 @@ export async function sendWave(wave: number, size = 12) {
   let sent = 0;
   for (const r of rows) {
     const c = r.candidate.customer;
-    const { offer } = await createOffer(day, {
+    const { offer, funding } = await createOffer(day, {
       customer: c, service: r.service, chair: r.chair, start: r.start, end: r.end, price: r.price, wave,
     });
     await postMessage(day, c.id, "salon", openerText(day, c, r.service, r.start, r.price), {
-      template: "slot_offer_v2", links: [{ offer_id: offer.id, label: `Pay ₹${r.price}` }], call_button: true,
+      template: "slot_offer_v2", links: [{ offer_id: offer.id, label: `Pay ₹${r.price - (funding?.kind === "brand" ? funding.amount : 0)}` }], call_button: true,
     });
     sent++;
   }
@@ -83,9 +83,9 @@ export async function sendOne(wave: number, row: { customerId: string; chair: nu
   const service = day.services.find((s) => s.id === row.serviceId) ?? day.services.find((s) => s.id === c.usual_service_id)!;
   const { enforcePrice } = await import("./pricing");
   const { price } = enforcePrice(day, service, row.price);
-  const { offer } = await createOffer(day, { customer: c, service, chair: row.chair, start: row.start, end: row.start + service.duration_min, price, wave });
+  const { offer, funding } = await createOffer(day, { customer: c, service, chair: row.chair, start: row.start, end: row.start + service.duration_min, price, wave });
   await postMessage(day, c.id, "salon", openerText(day, c, service, row.start, price), {
-    template: "slot_offer_v2", links: [{ offer_id: offer.id, label: `Pay ₹${price}` }], call_button: true,
+    template: "slot_offer_v2", links: [{ offer_id: offer.id, label: `Pay ₹${price - (funding?.kind === "brand" ? funding.amount : 0)}` }], call_button: true,
   });
   return offer.id;
 }

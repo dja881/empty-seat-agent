@@ -15,7 +15,7 @@ interface Booking {
 }
 interface Report {
   bookings: Booking[];
-  totals: { rev: number; exp: number; fee: number; extra: number; paid: number; m: number; b: number };
+  totals: { rev: number; exp: number; fee: number; extra: number; paid: number; m: number; b: number; bank: number; brand: number };
   sold: number; released: number; notConverted: number; nearbyTypical: number; feeRate: number; openUnits: number;
   budget: { limit: number; spent: number; reserved: number; available: number; projected: number; perDayLeft: number; days: { label: string; value: number; today: boolean }[] };
   walkIns: { kept: number; came: number; byHour: { label: string; kept: number; came: number }[]; suggest: number; window: string };
@@ -40,7 +40,7 @@ export default function SummaryPage() {
   const closed = data ? istMinutes(data.demo.clock_at) >= 20 * 60 : false;
 
   return (
-    <AppShell title="Empty Seat Agent" crumbs={["Agents"]}
+    <AppShell title="Ray" crumbs={["Agents", "Empty seats"]}
       actions={data && <div className="flex items-center gap-4"><div className="hidden md:block"><DayStats data={data} /></div><DemoBar demo={data.demo} /></div>}>
       {data && (
         <div className="mb-4">
@@ -100,7 +100,7 @@ function ReportBody({ r, topic, setTopic, hover, setHover, bHover, setBHover, ho
   const riskNote = hold > w.came + 2
     ? "Likely to leave chairs empty if walk-ins stay as quiet as today."
     : hold > w.came
-      ? `Enough room for the ${w.came} walk-ins seen today. The agent stops offering the extra slots by 2 pm if walk-ins pick up.`
+      ? `Enough room for the ${w.came} walk-ins seen today. Ray stops offering the extra slots by 2 pm if walk-ins pick up.`
       : `At or below today's ${w.came} walk-ins. Some walk-ins may be turned away if the afternoon is busier.`;
 
   return (
@@ -197,7 +197,7 @@ function ReportBody({ r, topic, setTopic, hover, setHover, bHover, setBHover, ho
 
       {/* what the agent learned */}
       <section className="flex flex-col gap-4 rounded-xl border border-line bg-surface p-6">
-        <h2 className="text-[16px] font-medium text-ink">What the agent learned</h2>
+        <h2 className="text-[16px] font-medium text-ink">What Ray learned</h2>
         <div className="flex flex-wrap items-center gap-x-6 gap-y-4 text-[14px]">
           <div className="min-w-0 flex-1 basis-[260px]">
             <div className="text-[12px] tracking-[.06em] text-muted">TODAY&apos;S SIGNAL</div>
@@ -244,8 +244,8 @@ function Details({ r, topic, close, hold, setHold, offered, planExtra, risk, ris
   const T: Record<Topic, { kicker: string; title: string; intro: string; ledger?: Ledger; listTitle?: string; list?: Row[]; note?: string; squares?: boolean; days?: boolean; plan?: boolean }> = {
     extra: {
       kicker: "ESTIMATED EXTRA REVENUE", title: `How ${fmt(t.extra)} adds up`,
-      intro: "Money you most likely would not have made today without the agent.",
-      ledger: [["Customers paid", fmt(t.paid)], ["Partner offers (banks)", `+${fmt(t.b)}`], ["Booking revenue", fmt(t.rev), true],
+      intro: "Money you most likely would not have made today without Ray.",
+      ledger: [["Customers paid", fmt(t.paid)], ["Partner offers (banks, brands)", `+${fmt(t.b)}`], ["Booking revenue", fmt(t.rev), true],
         ["Would likely have booked anyway", `−${fmt(t.exp)}`], [`Agent fee, ${Math.round(r.feeRate * 100)}%`, `−${fmt(t.fee)}`], ["Extra revenue", fmt(t.extra), true]],
       listTitle: "By appointment", list: list((a) => a.extra, (a) => `${a.service} · ${a.time}`, BLUE),
       note: "An estimate, not profit after stylist and product costs.",
@@ -259,7 +259,7 @@ function Details({ r, topic, close, hold, setHold, offered, planExtra, risk, ris
     },
     expected: {
       kicker: "EXPECTED WITHOUT OFFERS", title: `${fmt(t.exp)} you would likely have got anyway`,
-      intro: "Each booking × the chance that customer would have come without an offer. We take this out so the agent only gets credit for new business.",
+      intro: "Each booking × the chance that customer would have come without an offer. We take this out so Ray only gets credit for new business.",
       listTitle: "Chance they would have booked anyway",
       list: list((a) => a.exp, (a) => (a.p ? `${Math.round(a.p * 100)}% · ${a.why}` : `Unlikely · ${a.why}`), BLUE_MID, true),
       note: "In a pilot, this baseline would be checked against customers and slots that got no offer.",
@@ -279,14 +279,14 @@ function Details({ r, topic, close, hold, setHold, offered, planExtra, risk, ris
     spend: {
       kicker: "DISCOUNT SPEND", title: "Who paid for the discounts",
       intro: `Customers saved ${fmt(saved)} in total. You covered ${fmt(t.m)} of it.`,
-      ledger: [["Funded by you", fmt(t.m)], ["Bank offers", fmt(t.b)], ["Customers saved", fmt(saved), true], ["Your cost per paid booking", fmt(r.sold ? t.m / r.sold : 0)]],
+      ledger: [["Funded by you", fmt(t.m)], ["Bank offers", fmt(t.bank)], ["Brand offers", fmt(t.brand)], ["Customers saved", fmt(saved), true], ["Your cost per paid booking", fmt(r.sold ? t.m / r.sold : 0)]],
       listTitle: "Discount on each booking",
       list: list((a) => a.m + a.b, (a) => `You ${fmt(a.m)}${a.b ? ` · ${a.src} ${fmt(a.b)}` : " · no partner offer"}`, BLUE),
       note: `Only your ${fmt(t.m)} counts toward the monthly offer budget.`,
     },
     budget: {
       kicker: "MONTHLY OFFER BUDGET", title: `${fmt(bg.available)} left for October`,
-      intro: `At this pace you will use about ${fmt(bg.projected)} by 31 Oct, ${bg.projected <= bg.limit * 0.85 ? "well inside the cap" : bg.projected <= bg.limit ? "just inside the cap" : "above the cap, so the agent will slow down discounts"}.`,
+      intro: `At this pace you will use about ${fmt(bg.projected)} by 31 Oct, ${bg.projected <= bg.limit * 0.85 ? "well inside the cap" : bg.projected <= bg.limit ? "just inside the cap" : "above the cap, so Ray will slow down discounts"}.`,
       ledger: [["Monthly limit", fmt(bg.limit)], ["Spent so far", `−${fmt(bg.spent)}`], ["Reserved for live offers", `−${fmt(bg.reserved)}`], ["Available", fmt(bg.available), true]],
       days: true, note: "Reserved money returns to the budget if those offers expire unpaid.",
     },
@@ -366,7 +366,7 @@ function Details({ r, topic, close, hold, setHold, offered, planExtra, risk, ris
                 </label>
                 <input id="hold" type="range" min={Math.max(2, w.suggest - 2)} max={w.kept} step={1} value={hold} onChange={(e) => setHold(Number(e.target.value))} className="w-full accent-[#1f5eff]" />
                 <div className="flex justify-between text-[12px] text-muted">
-                  <span>{Math.max(2, w.suggest - 2)}</span><span>Agent suggests {w.suggest} · today {w.kept}</span><span>{w.kept}</span>
+                  <span>{Math.max(2, w.suggest - 2)}</span><span>Ray suggests {w.suggest} · today {w.kept}</span><span>{w.kept}</span>
                 </div>
               </div>
             </div>

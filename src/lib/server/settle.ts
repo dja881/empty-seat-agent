@@ -8,7 +8,7 @@ import { istMinutes } from "../time";
 export interface OfferDetail {
   id: string; customer_id: string; guest_name: string | null; service_id: string; chair: number;
   start_at: string; end_at: string; price: number; funded_amount: number; funder: string | null;
-  status: string; razorpay_order_id: string | null; group_id: string | null; wave: number;
+  status: string; razorpay_order_id: string | null; group_id: string | null; wave: number; funder_kind: "bank" | "brand" | null;
   customers: { name: string; phone: string } | null;
   services: { name: string; duration_min: number } | null;
 }
@@ -16,6 +16,14 @@ export interface OfferDetail {
 export async function getOffer(id: string) {
   return must(await db.from("offers").select("*, customers(name, phone), services(name, duration_min)")
     .eq("id", id).single(), "offer") as OfferDetail;
+}
+
+/**
+ * The partner-funded amount on a payment. A brand offer always applies; a bank offer applies
+ * only when the customer picks that bank's card at checkout (variant "bank").
+ */
+export function fundedFor(o: Pick<OfferDetail, "funded_amount" | "funder_kind">, variant: string) {
+  return o.funder_kind === "brand" || variant === "bank" ? o.funded_amount : 0;
 }
 
 /** Is the offer's time still open on its chair? */

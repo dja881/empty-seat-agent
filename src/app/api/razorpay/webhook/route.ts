@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     if (offerId) {
       await settle(offerId, {
         orderId: p.order_id, paymentId: p.id, amount: Math.round(p.amount / 100),
-        funded: p.notes?.variant === "bank" ? Number(p.notes?.funded ?? 0) : 0, simulated: false,
+        funded: Number(p.notes?.funded ?? 0), simulated: false,
       });
     }
   }

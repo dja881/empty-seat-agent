@@ -14,7 +14,8 @@ interface Merchant {
 const OFFERS = [
   { id: "pay_now", label: "Pay now to lock the slot", hint: "Discount only with prepayment" },
   { id: "friend", label: "Bring a friend", hint: "Each person pays their own share" },
-  { id: "bank", label: "Bank-funded offers", hint: "HDFC Bank · ₹50 off · min ₹300", fixed: true },
+  { id: "bank", label: "Bank-funded offers", hint: "HDFC Bank · ₹50 off on HDFC cards · min ₹300", fixed: true },
+  { id: "brand", label: "Brand-funded offers", hint: "L'Oréal Professionnel · ₹100 off hair spa", fixed: true },
   { id: "pass", label: "Off-peak pass (UPI Autopay)", hint: "Suggested from weekly patterns" },
 ];
 
@@ -40,7 +41,7 @@ export default function SettingsPage() {
   const setSvc = (id: string, patch: Partial<Service>) => setServices((xs) => xs.map((s) => (s.id === id ? { ...s, ...patch } : s)));
 
   return (
-    <AppShell title="Agent limits" crumbs={["Agents", "Empty Seat Agent", "Settings"]}
+    <AppShell title="Agent limits" crumbs={["Agents", "Ray", "Settings"]}
       actions={
         <div className="flex gap-2">
           <button onClick={load} className="rounded-lg border border-line px-3 py-1.5 text-[13px] font-medium text-ink-2 hover:bg-background">Cancel</button>
@@ -54,7 +55,7 @@ export default function SettingsPage() {
       {m && (
         <div className="grid gap-4 xl:grid-cols-2">
           <div className="space-y-4">
-            <Card title="Prices and floors" sub="The floor is what the salon receives, including any bank-funded amount.">
+            <Card title="Prices and floors" sub="The floor is what the salon receives, including any amount a bank or brand funds.">
               <table className="w-full text-[13px]">
                 <thead><tr className="text-left text-[12px] text-muted"><th className="pb-2 font-medium">Service</th><th className="pb-2 font-medium">List price</th><th className="pb-2 font-medium">Floor</th><th className="pb-2 font-medium">Discount</th></tr></thead>
                 <tbody>

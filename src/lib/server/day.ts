@@ -15,7 +15,7 @@ export interface CustomerRow {
   usual_time_band: "morning" | "afternoon" | "evening"; usual_service_id: string; avg_spend: number;
   past_offer_response: number; card_issuer: string | null; is_regular: boolean; opted_out: boolean;
 }
-export interface FunderRow { id: string; funder: string; card_issuer: string; max_funded_amount: number; min_ticket: number }
+export interface FunderRow { id: string; funder: string; card_issuer: string | null; max_funded_amount: number; min_ticket: number; kind: "bank" | "brand"; service_id: string | null }
 export interface DemoRow { demo_date: string; clock_at: string; mode: "demo" | "live"; scripted: boolean; sim_step: number; plan: Plan | null }
 
 export interface Plan {

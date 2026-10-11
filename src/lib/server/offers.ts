@@ -1,7 +1,7 @@
 import "server-only";
 import { db, MERCHANT_ID, must } from "./db";
 import { atMinutes, slotForChair, timeLabel, type CustomerRow, type Day, type ServiceRow } from "./day";
-import { anyFunding, fundingFor } from "./pricing";
+import { anyFunding, fundingFor, priceLine } from "./pricing";
 
 export interface LinkButton { offer_id: string; label: string }
 
@@ -21,8 +21,9 @@ export async function createOffer(day: Day, o: {
 }) {
   const slot = slotForChair(day, o.chair, o.start, o.end);
   if (!slot) throw new Error(`no open time on chair ${o.chair} at ${timeLabel(o.start)}`);
-  // Any HDFC card can take the bank-funded price at checkout, not only the customer's known card.
-  const funding = anyFunding(day, o.price);
+  // A brand offer applies whatever the payment method; a bank offer is available at checkout
+  // to anyone paying with that bank's card, not only the customer's known card.
+  const funding = anyFunding(day, o.price, o.service.id);
   const row = must(await db.from("offers").insert({
     slot_id: slot.id,
     customer_id: o.customer.id,
@@ -31,6 +32,7 @@ export async function createOffer(day: Day, o: {
     service_id: o.service.id,
     wave: o.wave,
     offer_type: o.guestName ? "friend" : funding ? "bank_funded" : "pay_now",
+    funder_kind: funding?.kind ?? null,
     list_price: o.service.price,
     price: o.price,
     funded_amount: funding?.amount ?? 0,
@@ -62,10 +64,11 @@ const first = (name: string) => name.split(" ")[0];
 /** The approved WhatsApp template for the first message of a wave. */
 export function openerText(day: Day, c: CustomerRow, service: ServiceRow, start: number, price: number) {
   const weeks = Math.max(1, Math.round((new Date(day.demo.clock_at).getTime() - new Date(c.last_visit_at).getTime()) / (7 * 86400000)));
-  const funding = fundingFor(day, c, price);
-  const bank = funding ? `, or ₹${price - funding.amount} with an ${funding.issuer} card` : "";
+  const funding = fundingFor(day, c, price, service.id);
   return `Hi ${first(c.name)}, this is ${day.merchant.front_desk_name} from ${day.merchant.name.replace(/\.$/, "")}. ` +
     `It's been ${weeks} weeks since your last ${service.name.toLowerCase()}. ` +
-    `${timeLabel(start)} today: ₹${price} if you pay now${bank}. Usually ₹${service.price}. ` +
+    (funding?.kind === "brand"
+      ? `${timeLabel(start)} today: ₹${price - funding.amount} if you pay now, with ₹${funding.amount} off from ${funding.funder.split(" ")[0]}. Usually ₹${service.price}. `
+      : `${timeLabel(start)} today: ${priceLine(price, funding).replace(/^(₹\d+)/, "$1 if you pay now")}. Usually ₹${service.price}. `) +
     `Tap to call me anytime.`;
 }

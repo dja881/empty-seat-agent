@@ -37,7 +37,7 @@ export default function AgentsPage() {
   const customerPrices = result?.rounds.slice(0, shown).map((r) => r.customer.price).filter((p): p is number => !!p) ?? [];
 
   return (
-    <AppShell title={`Booking request from Kavya's assistant`} crumbs={["Agents", "Empty Seat Agent", "Negotiations"]}
+    <AppShell title={`Booking request from Kavya's assistant`} crumbs={["Agents", "Ray", "Negotiations"]}
       actions={
         <div className="flex items-center gap-2 text-[13px]">
           <span className="text-muted">Customer&apos;s max</span>
@@ -73,7 +73,7 @@ export default function AgentsPage() {
             </div>
             <div />
             <div>
-              <div className="font-semibold text-ink">Empty Seat Agent · Strand & Co.</div>
+              <div className="font-semibold text-ink">Ray · Strand & Co.</div>
               <span className="mt-1 inline-flex items-center gap-1 rounded bg-accent-soft px-1.5 py-0.5 text-[11px] text-accent"><Lock className="h-3 w-3" /> Floor ₹{result?.floor ?? 350} · hidden from customer</span>
             </div>
           </div>
