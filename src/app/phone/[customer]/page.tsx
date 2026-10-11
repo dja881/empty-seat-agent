@@ -15,6 +15,15 @@ export default function PhonePage({ params }: { params: Promise<{ customer: stri
   const [name, setName] = useState("");
   const [first, setFirst] = useState<{ id: string; body: string } | null | undefined>(undefined);
   const [opened, setOpened] = useState(false);
+  // ?arrive=1 (set by the dashboard right after the offers go out): the phone sits quiet on its
+  // lock screen for a moment, then the notification lands.
+  const [quiet, setQuiet] = useState(false);
+  useEffect(() => {
+    if (!new URLSearchParams(window.location.search).has("arrive")) return;
+    setQuiet(true);
+    const t = setTimeout(() => setQuiet(false), 1900);
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => {
     supabase.from("customers").select("name").eq("id", id).single().then(({ data }) => data && setName(data.name));
@@ -37,13 +46,13 @@ export default function PhonePage({ params }: { params: Promise<{ customer: stri
   }, [first?.id]);
 
   const open = () => { if (first) sessionStorage.setItem(`opened-${first.id}`, "1"); setOpened(true); };
-  const showChat = opened || first === undefined;
+  const showChat = !quiet && (opened || first === undefined);
 
   return (
     <PhoneFrame clock={clock?.clock_at} dark={showChat}>
       {showChat
         ? <WhatsAppChat customerId={id} customerName={name} />
-        : <LockScreen clock={clock?.clock_at} from="Strand & Co." text={first?.body} onOpen={open} />}
+        : <LockScreen clock={clock?.clock_at} from="Strand & Co." text={quiet ? undefined : first?.body} onOpen={open} />}
     </PhoneFrame>
   );
 }

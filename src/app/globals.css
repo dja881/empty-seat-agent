@@ -71,3 +71,9 @@ body {
 .tour-tip .next{background:#2563EB;color:#fff}
 .tour-tip .ar{position:absolute;width:12px;height:12px;background:#0B1220;transform:rotate(45deg)}
 .tour-spot{position:fixed;z-index:60;pointer-events:none;box-shadow:0 0 0 9999px rgba(11,18,32,.45);outline:2px solid #4C8DFF;transition:left .2s,top .2s,width .2s,height .2s}
+
+/* Easing into the live view after the offers go out. */
+@keyframes enter-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes enter-right { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
+.enter-up { animation: enter-up .6s ease both; }
+.enter-right { animation: enter-right .7s cubic-bezier(.2,.8,.2,1) .35s both; }

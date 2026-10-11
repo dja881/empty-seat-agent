@@ -46,6 +46,9 @@ function Merchant() {
   const events = useEvents();
   const [plan, setPlan] = useState<Plan | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  // True when the live view is entered straight from sending the offers, so it eases in
+  // (board first, then the phone, then the notification) instead of cutting.
+  const [arriving, setArriving] = useState(false);
   useEffect(() => { if (data) setPlan(data.demo.plan); }, [data?.demo.plan]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onPlan = useCallback((p: Plan) => setPlan(p), []);
@@ -59,6 +62,9 @@ function Merchant() {
   const order: Stage[] = ["idle", "plan", "customers", "live", "done"];
   const view: Stage = asked && order.indexOf(asked) <= order.indexOf(stage) && asked !== "idle" ? asked : stage === "done" ? "live" : stage;
   const go = (v: Stage) => router.replace(v === stage ? "/merchant" : `/merchant?view=${v}`);
+
+  // Arriving on the live view after sending: start at the top of the page.
+  useEffect(() => { if (arriving && view === "live") window.scrollTo({ top: 0, behavior: "smooth" }); }, [arriving, view]);
 
   // The guided tour follows the day: which tip fits what is on screen right now.
   const has = (type: string) => events.some((e) => e.type === type);
@@ -163,12 +169,12 @@ function Merchant() {
           )}
 
           {view === "customers" && (
-            <WaveView mode={data.demo.mode} alreadySent={waveSent} trigger={trigger} onSending={setBusy} onDone={() => router.replace("/merchant")} />
+            <WaveView mode={data.demo.mode} alreadySent={waveSent} trigger={trigger} onSending={setBusy} onDone={() => { setArriving(true); window.scrollTo({ top: 0, behavior: "smooth" }); router.replace("/merchant"); }} />
           )}
 
           {view === "live" && (
             <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_350px]">
-              <div className="min-w-0 space-y-3">
+              <div className={`min-w-0 space-y-3 ${arriving ? "enter-up" : ""}`}>
                 <FootfallAlert events={events} now={now} />
                 <AgentBar chat={chat} skip={String(events.find((e) => e.type === "footfall_alert")?.payload.text ?? "")} />
                 <PaneLabel title="Strand & Co.'s chairs" sub="What Daivik sees. Offers go out, customers pay, chairs turn green." />
@@ -176,9 +182,9 @@ function Merchant() {
                 <CalendarLegend />
                 <ActivityFeed events={events} limit={5} />
               </div>
-              <div>
+              <div className={arriving ? "enter-right" : ""}>
                 <PaneLabel title="Customer's phone" sub="What they see. Type a reply, then pay." />
-                <LivePhone />
+                <LivePhone arriving={arriving} />
               </div>
             </div>
           )}

@@ -8,8 +8,11 @@ import { supabase } from "@/lib/supabase";
  * The customer's real phone view, embedded live next to the board. Same page as
  * /phone/[customer], so whatever is typed there reaches the live agent.
  */
-export function LivePhone({ initial = "c_riya" }: { initial?: string }) {
+export function LivePhone({ initial = "c_riya", arriving = false }: { initial?: string; arriving?: boolean }) {
   const [customer, setCustomer] = useState(initial);
+  // Fixed at mount: when the offers have just gone out, the phone starts quiet and the
+  // notification lands a moment later.
+  const [arrive] = useState(arriving);
   const [threads, setThreads] = useState<{ id: string; name: string }[]>([]);
 
   useEffect(() => {
@@ -38,7 +41,7 @@ export function LivePhone({ initial = "c_riya" }: { initial?: string }) {
         </a>
       </div>
       <div data-tour="customer-phone" className="h-[690px] w-[330px] overflow-hidden rounded-[40px] border-[9px] border-[#1c1c1e] bg-black shadow-xl">
-        <iframe key={customer} src={`/phone/${customer}`} title={`${name}'s phone`} className="h-full w-full bg-white" />
+        <iframe key={customer} src={`/phone/${customer}${arrive && customer === initial ? "?arrive=1" : ""}`} title={`${name}'s phone`} className="h-full w-full bg-white" />
       </div>
     </div>
   );
