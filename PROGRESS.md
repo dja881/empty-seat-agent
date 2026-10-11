@@ -41,3 +41,4 @@ _Last updated: 11 Oct 2026_
 
 - 11 Oct: Context reset. Re-read build log, git history, migrations, seed and README. Wrote `CLAUDE.md` and this file. No code changed.
 - 11 Oct: Start-screen cleanup. Landing button is now "Open Daivik's salon"; the top-right "Start my day" is hidden until the day starts, so the wake-up card is the only start button; card says "32 slots are empty" (was "chairs"). Owner renamed Priya to Daivik (migration 0011, applied). Regression passed: 7 slots, ₹3,160, ₹200 partner-funded. Confirmed in the browser: one "Start my day" button on the dashboard.
+- 11 Oct: Landing button corrected to "Open Strand & Co." (I had wrongly put the owner's name on it). Label-only change; type-check and lint passed, regression not re-run.

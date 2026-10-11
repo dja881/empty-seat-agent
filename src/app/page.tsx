@@ -45,7 +45,7 @@ export default function Opening() {
 
         <button onClick={start} disabled={starting}
           className="inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-lg bg-[#1566F1] px-7 text-[16px] font-semibold text-white hover:bg-[#0F52C6] disabled:opacity-70">
-          {starting ? "Opening the salon…" : "Open Daivik's salon"}
+          {starting ? "Opening the salon…" : "Open Strand & Co."}
           {!starting && (
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="M5 12h14M13 6l6 6-6 6" />

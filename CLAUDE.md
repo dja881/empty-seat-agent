@@ -9,7 +9,7 @@ Read `PROGRESS.md` first for where things stand. Update it after each step.
 ## Current facts (these override the PRD)
 
 - The agent is **Ray** (Razorpay's agent). Voice: ElevenLabs **Brian** (`nPczCjzI2devNBz1zQrb`).
-- The salon owner in the demo is **Daivik** (was Priya). Landing button reads "Open Daivik's salon".
+- The salon owner in the demo is **Daivik** (was Priya). Landing button reads "Open Strand & Co." (the salon name, not the owner's).
 - Customers hear from **Sneha**, the front desk. Ray never speaks to customers in his own name.
 - Demo salon: **Strand & Co.**, Madhapur, Hyderabad. Internal merchant id is still `glow`.
 - Demo day is Tue 13 Oct 2026: 32 empty slots, 22 offered, 10 kept for walk-ins.
