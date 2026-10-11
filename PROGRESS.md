@@ -40,4 +40,4 @@ _Last updated: 11 Oct 2026_
 ## Step log
 
 - 11 Oct: Context reset. Re-read build log, git history, migrations, seed and README. Wrote `CLAUDE.md` and this file. No code changed.
-- 11 Oct: Start-screen cleanup. Landing button is now "Open Daivik's salon"; the top-right "Start my day" is hidden until the day starts, so the wake-up card is the only start button; card says "32 slots are empty" (was "chairs"). Owner renamed Priya to Daivik (migration 0011, applied). Regression passed: 7 slots, ₹3,160, ₹200 partner-funded. Not checked by eye in a browser.
+- 11 Oct: Start-screen cleanup. Landing button is now "Open Daivik's salon"; the top-right "Start my day" is hidden until the day starts, so the wake-up card is the only start button; card says "32 slots are empty" (was "chairs"). Owner renamed Priya to Daivik (migration 0011, applied). Regression passed: 7 slots, ₹3,160, ₹200 partner-funded. Confirmed in the browser: one "Start my day" button on the dashboard.
