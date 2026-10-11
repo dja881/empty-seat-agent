@@ -18,8 +18,8 @@ _Last updated: 11 Oct 2026_
 ## Left to do
 
 ### Waiting on the user
-- [ ] Import the repo into Vercel with all env vars (the connector cannot create the project).
-- [ ] After deploy: create the Razorpay webhook (`/api/razorpay/webhook`, event `payment.captured`).
+- [x] Vercel import done by the user on 12 Oct. Live at https://empty-seat-agent.vercel.app.
+- [x] Razorpay webhook: skipped by the user's choice (payments confirm through Checkout).
 - [ ] Send the list of pre-build decisions for the top of `BUILD_LOG.md`.
 - [ ] Decide: keep L'Oréal as the brand example, or use a made-up brand.
 - [ ] Decide: simpler overall structure (three moments / board as stage / phone first).
@@ -56,3 +56,4 @@ _Last updated: 11 Oct 2026_
 - 12 Oct: Handover from sending offers to the live view no longer cuts: the board fades up, the phone slides in from the right, the lock screen sits quiet for about 2 seconds, then the WhatsApp notification lands. Only when arriving straight from sending; reloads and going back show the view at once. Checked the end state on screen and that the notification arrives; the motion itself was not watched frame by frame. Regression PASS.
 - 12 Oct: Production build verified (`next build` in a separate worktree, so the dev server was untouched): compiles, 29 pages, no errors. All 11 keys present in `.env.local`. Vercel: team `dja7` has no projects; creating one through the connector is still refused (403) and there is no Vercel CLI on this machine, so the user has to import the repo in the Vercel dashboard.
 - 12 Oct: First Vercel deploy built fine but Vercel flagged Next.js 15.5.4 as vulnerable (CVE-2025-66478). Upgraded to 15.5.27 (same minor, patch only). Verified by building it and running the production server on port 3100: regression PASS. While shutting that test server down, the user's dev server on port 3000 also stopped; they need to run `npm run dev` again. Do not use a broad pkill for this in future: stop the test server by its own process id.
+- 12 Oct: Live on Vercel at https://empty-seat-agent.vercel.app (commit 68fbe84, Next.js 15.5.27, status Ready). All pages answer; /agents is 404 as intended. Full regression against the live site: PASS. Two earlier live runs failed only because the shared database was reset mid-run by someone else using the demo at the same time (events and plan were wiped part-way). Not tested on the live site: a real Razorpay payment, voice, the tour in a browser.
