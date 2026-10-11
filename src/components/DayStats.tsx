@@ -5,9 +5,20 @@ import type { BoardData } from "@/lib/useBoardData";
 import { emptySlotCount, soldRevenue } from "@/lib/slots";
 import { formatClockFull, formatDay, rupees } from "@/lib/time";
 
-/** Header stats: demo clock, open slots, booking revenue from slots the agent sold today (the report's total, before the estimate of what is extra). */
+/**
+ * Header stats: demo clock, open slots, and the day's estimated extra revenue. That is the
+ * same figure, by the same name, as the headline of the day report (booking revenue minus what
+ * would likely have come in anyway and the agent's fee), refreshed whenever a slot is sold.
+ */
 export function DayStats({ data }: { data: BoardData }) {
-  const revenue = useCountUp(soldRevenue(data.slots));
+  const sold = soldRevenue(data.slots);
+  const [extra, setExtra] = useState(0);
+  useEffect(() => {
+    let live = true;
+    fetch("/api/report").then((r) => r.json()).then((r) => { if (live) setExtra(r?.totals?.extra ?? 0); }).catch(() => {});
+    return () => { live = false; };
+  }, [sold]);
+  const revenue = useCountUp(extra);
   const stat = (label: string, value: React.ReactNode, cls = "text-ink") => (
     <div className="px-4 text-right first:pl-0">
       <div className="text-[11px] text-muted">{label}</div>
@@ -18,7 +29,7 @@ export function DayStats({ data }: { data: BoardData }) {
     <div className="flex items-center divide-x divide-line">
       {stat(formatDay(data.demo.clock_at).replace(/^\w+, /, ""), formatClockFull(data.demo.clock_at))}
       {stat("Open slots", emptySlotCount(data.slots))}
-      {stat("Booked by RAY", rupees(revenue), "text-success")}
+      {stat("Estimated extra revenue", rupees(revenue), "text-success")}
     </div>
   );
 }
