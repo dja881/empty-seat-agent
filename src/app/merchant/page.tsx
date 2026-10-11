@@ -4,6 +4,8 @@ import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, CheckCircle2, RotateCcw, Sun, TrendingDown } from "lucide-react";
 import { VoiceToggle } from "@/components/agent/VoiceToggle";
+import { TipsToggle } from "@/components/tour/Tour";
+import { tour, useTourStep } from "@/lib/tour";
 import { AppShell } from "@/components/shell/AppShell";
 import { Calendar, CalendarLegend } from "@/components/Calendar";
 import { DayStats } from "@/components/DayStats";
@@ -58,6 +60,15 @@ function Merchant() {
   const view: Stage = asked && order.indexOf(asked) <= order.indexOf(stage) && asked !== "idle" ? asked : stage === "done" ? "live" : stage;
   const go = (v: Stage) => router.replace(v === stage ? "/merchant" : `/merchant?view=${v}`);
 
+  // The guided tour follows the day: which tip fits what is on screen right now.
+  const has = (type: string) => events.some((e) => e.type === type);
+  useTourStep(!data || busy || view !== (stage === "done" ? "live" : stage) ? null
+    : stage === "idle" ? 2
+    : stage === "plan" ? (has("plan_edited") ? 4 : 3)
+    : stage === "customers" ? 5
+    : stage === "done" || now >= 13 * 60 + 30 ? 9
+    : has("paid") ? 8 : has("reply") ? 7 : 6);
+
   // The agent speaks the 1:30 pm footfall alert when it happens while you're watching,
   // never again on a reload or when you come back to this screen.
   const spoken = useRef(new Set<string>());
@@ -89,22 +100,23 @@ function Merchant() {
     const labels: Record<Stage, string> = { idle: "morning plan", plan: "morning plan", customers: "customers", live: "live sales", done: "live sales" };
     if (view !== stage && !(stage === "done" && view === "live")) return { label: `Back to ${labels[stage]}`, run: () => go(stage) };
     if (stage === "customers") return {
-      label: data.demo.mode === "demo" ? "Send offers at 11:30 am" : "Send offers now",
+      label: data.demo.mode === "demo" ? "Send offers at 11:30 am" : "Send offers now", tour: "send-offers",
       run: () => setTrigger((t) => t + 1),
     };
-    if (stage === "live" && now < 13 * 60 + 30) return { label: "Skip to 1:30 pm", run: () => runSteps("Moving to 1:30 pm…", MIDDAY, 1200) };
+    if (stage === "live" && now < 13 * 60 + 30) return { label: "Skip to 1:30 pm", tour: "skip-time", run: () => runSteps("Moving to 1:30 pm…", MIDDAY, 1200) };
     if (stage === "live" && now < 18 * 60) return { label: "Fast-forward to 6 pm", run: () => runSteps("Fast-forwarding…", AFTERNOON, 900) };
-    if (stage === "live") return { label: "Close the day", run: async () => { await post("/api/demo/clock", { to: "20:00" }); window.location.href = "/merchant/summary"; } };
-    return { label: "See the day report", run: () => { window.location.href = "/merchant/summary"; } };
+    if (stage === "live") return { label: "Close the day", tour: "close-day", run: async () => { await post("/api/demo/clock", { to: "20:00" }); window.location.href = "/merchant/summary"; } };
+    return { label: "See the day report", tour: "close-day", run: () => { window.location.href = "/merchant/summary"; } };
   })();
 
   return (
-    <AppShell title="RAY" crumbs={["Agents", "Empty seats"]}
+    <AppShell title="RAY" crumbs={["Agents", "Empty seats"]} tips={!data}
       actions={data && (
         <div className="flex items-center gap-3">
           <div className="hidden md:block"><DayStats data={data} /></div>
+          <TipsToggle />
           <VoiceToggle />
-          <button onClick={async () => { await post("/api/demo/reset", {}); window.location.href = "/merchant"; }}
+          <button onClick={async () => { tour.restart(); await post("/api/demo/reset", {}); window.location.href = "/merchant"; }}
             className="flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-[13px] font-medium text-ink-2 hover:bg-background">
             <RotateCcw className="h-3.5 w-3.5" /> Restart demo
           </button>
@@ -117,7 +129,7 @@ function Merchant() {
         <div className="space-y-4">
           <FlowBar stage={stage} view={view} next={next} busy={busy}
             extra={stage === "live" && view === "live" && now < 18 * 60 && (
-              <button disabled={!!busy} onClick={async () => { setBusy("Closing the day…"); await post("/api/demo/clock", { to: "20:00" }); window.location.href = "/merchant/summary"; }}
+              <button data-tour="close-day" disabled={!!busy} onClick={async () => { setBusy("Closing the day…"); await post("/api/demo/clock", { to: "20:00" }); window.location.href = "/merchant/summary"; }}
                 className="rounded-lg border border-line px-3 py-2 text-[13px] font-medium text-ink-2 hover:bg-background disabled:opacity-50">Close the day</button>
             )} />
 
@@ -130,7 +142,7 @@ function Merchant() {
                     <Sun className="mx-auto h-8 w-8 text-[#f5b800]" />
                     <h2 className="mt-3 text-[22px] font-semibold text-ink">Good morning, {data.merchant.owner_name}</h2>
                     <p className="mt-1 text-[14px] text-muted">{emptySlotCount(data.slots)} slots are empty today, mostly after lunch.</p>
-                    <button onClick={() => chat.wake()} className="mt-5 inline-flex items-center gap-2 rounded-xl bg-accent px-5 py-3 text-[15px] font-semibold text-white shadow-sm hover:bg-[#1849d6]">
+                    <button data-tour="start-day" onClick={() => chat.wake()} className="mt-5 inline-flex items-center gap-2 rounded-xl bg-accent px-5 py-3 text-[15px] font-semibold text-white shadow-sm hover:bg-[#1849d6]">
                       Start my day <ArrowRight className="h-4 w-4" />
                     </button>
                   </div>

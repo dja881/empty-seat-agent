@@ -59,3 +59,15 @@ body {
 }
 
 @keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
+
+/* Guided tour: tooltip, outline round the target, dimmed page (styles from the tour spec). */
+.tour-tip{position:fixed;z-index:70;width:320px;box-sizing:border-box;background:#0B1220;color:#fff;border-radius:12px;padding:14px 16px;font-size:14px;line-height:1.5;box-shadow:0 12px 32px rgba(11,18,32,.35);text-align:left}
+.tour-tip .hd{display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:6px}
+.tour-tip .n{color:#8FB3F9;font-weight:600}
+.tour-tip .skip{color:#9AA3AE;background:none;border:none;font:inherit;font-size:12px;cursor:pointer;padding:0}
+.tour-tip .ft{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.tour-tip .b{min-height:34px;padding:0 14px;border-radius:8px;border:none;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.tour-tip .back{background:transparent;color:#C9CED6;border:1px solid rgba(201,206,214,.3)}
+.tour-tip .next{background:#2563EB;color:#fff}
+.tour-tip .ar{position:absolute;width:12px;height:12px;background:#0B1220;transform:rotate(45deg)}
+.tour-spot{position:fixed;z-index:60;pointer-events:none;box-shadow:0 0 0 9999px rgba(11,18,32,.45);outline:2px solid #4C8DFF;transition:left .2s,top .2s,width .2s,height .2s}

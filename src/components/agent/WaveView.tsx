@@ -73,7 +73,7 @@ export function WaveView({ mode, alreadySent, trigger, onSending, onDone }: {
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1fr_300px]">
-        <div className="overflow-x-auto rounded-xl border border-line bg-surface">
+        <div data-tour="offers-list" className="overflow-x-auto rounded-xl border border-line bg-surface">
           <table className="w-full min-w-[680px] text-[13px]">
             <thead>
               <tr className="border-b border-line text-left text-[12px] text-muted">

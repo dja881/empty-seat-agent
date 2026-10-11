@@ -1,5 +1,6 @@
 "use client";
 
+import { useTourStep } from "@/lib/tour";
 import { useEffect, useState } from "react";
 import { ArrowRight, ArrowUpRight, X } from "lucide-react";
 import { AppShell } from "@/components/shell/AppShell";
@@ -38,6 +39,7 @@ export default function SummaryPage() {
   useEffect(() => { fetch("/api/report").then((x) => x.json()).then(setR); }, [data?.slots.length]);
 
   const closed = data ? istMinutes(data.demo.clock_at) >= 20 * 60 : false;
+  useTourStep(r ? 10 : null);
 
   return (
     <AppShell title="RAY" crumbs={["Agents", "Empty seats"]}
@@ -64,7 +66,7 @@ function ReportBody({ r, topic, setTopic, hover, setHover, bHover, setBHover, ho
   const rev = Math.max(t.rev, 1);
 
   const kpis: { t: Topic; label: string; value: string; foot: string }[] = [
-    { t: "extra", label: "Estimated extra revenue", value: fmt(t.extra), foot: "After agent fee" },
+    { t: "extra", label: "Estimated extra revenue", value: fmt(t.extra), foot: "After RAY's fee" },
     { t: "appts", label: "Paid appointments", value: String(r.sold), foot: `Out of ${r.released} offered` },
     { t: "spend", label: "Your discount spend", value: fmt(t.m), foot: t.b ? `+${fmt(t.b)} from partner offers` : "No partner offers used" },
   ];
@@ -110,7 +112,7 @@ function ReportBody({ r, topic, setTopic, hover, setHover, bHover, setBHover, ho
         {kpis.map((k) => {
           const on = topic === k.t;
           return (
-            <button key={k.t} onClick={() => setTopic(k.t)} aria-pressed={on}
+            <button key={k.t} data-tour={k.t === "extra" ? "extra-revenue" : undefined} onClick={() => setTopic(k.t)} aria-pressed={on}
               className={`flex flex-col gap-2 rounded-xl border bg-surface px-6 py-5 text-left transition hover:bg-[#fafbfd] ${on ? "border-accent shadow-[0_0_0_3px_#dce6fd]" : "border-line"}`}>
               <span className="text-[12px] text-muted">{k.label}</span>
               <span className="tnum text-[28px] font-medium leading-tight tracking-tight text-ink">{k.value}</span>

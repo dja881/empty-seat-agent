@@ -58,10 +58,10 @@ export function AgentPanel({ chat, plan, ownerName, asleep }: { chat: Chat; plan
 
       {plan && plan.status === "proposed" && briefed && (
         <div className="px-4 pb-2">
-          <button onClick={chat.approve} className="w-full rounded-lg bg-accent py-2.5 text-[14px] font-semibold text-white hover:bg-[#1849d6]">Approve plan</button>
+          <button data-tour="approve-plan" onClick={chat.approve} className="w-full rounded-lg bg-accent py-2.5 text-[14px] font-semibold text-white hover:bg-[#1849d6]">Approve plan</button>
         </div>
       )}
-      {!asleep && <AskBar chat={chat} placeholder={plan?.status === "approved" ? "Ask RAY anything" : "Say or type a change, e.g. make it ₹100"} />}
+      {!asleep && <AskBar chat={chat} tour={plan?.status === "proposed" ? "plan-input" : undefined} placeholder={plan?.status === "approved" ? "Ask RAY anything" : "Say or type a change, e.g. make it ₹100"} />}
       <style>{`@keyframes fade-up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}`}</style>
     </div>
   );
@@ -92,7 +92,7 @@ function Bubble({ line, owner }: { line: Line; owner: string }) {
 }
 
 /** Talk or type to the agent, all day. */
-export function AskBar({ chat, placeholder, compact = false }: { chat: Chat; placeholder: string; compact?: boolean }) {
+export function AskBar({ chat, placeholder, compact = false, tour }: { chat: Chat; placeholder: string; compact?: boolean; tour?: string }) {
   const [text, setText] = useState("");
   return (
     <form onSubmit={(e) => { e.preventDefault(); chat.send(text); setText(""); }}
@@ -102,7 +102,7 @@ export function AskBar({ chat, placeholder, compact = false }: { chat: Chat; pla
         className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${chat.voice.listening ? "bg-danger text-white" : "border border-line text-ink-2 hover:bg-background"} disabled:opacity-40`}>
         {chat.voice.listening ? <Square className="h-3.5 w-3.5" /> : <Mic className="h-4 w-4" />}
       </button>
-      <input value={text} onChange={(e) => setText(e.target.value)} placeholder={chat.voice.listening ? "Listening…" : placeholder}
+      <input data-tour={tour} value={text} onChange={(e) => setText(e.target.value)} placeholder={chat.voice.listening ? "Listening…" : placeholder}
         className="min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 py-2 text-[13.5px] outline-none focus:border-accent" />
       <button type="submit" disabled={!text.trim()} aria-label="Send" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent text-white disabled:opacity-30">
         <SendHorizontal className="h-4 w-4" />

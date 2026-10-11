@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { StrandLogo } from "@/components/StrandLogo";
+import { TipsToggle } from "@/components/tour/Tour";
+import { tour, useTourStep } from "@/lib/tour";
 
 // The seeded Tuesday opens with 32 empty slots (about 27 chair-hours). At roughly ₹550 a
 // chair-hour over 21 weekdays, that is about ₹3 lakh a month of unsold time.
@@ -17,13 +19,16 @@ const Tick = () => (
 /** Opening screen: the salon, the problem in one number, and one button into the day. */
 export default function Opening() {
   const [starting, setStarting] = useState(false);
+  useTourStep(starting ? null : 1);
   async function start() {
     setStarting(true);
+    tour.restart();
     await fetch("/api/demo/reset", { method: "POST" });
     window.location.href = "/merchant";
   }
   return (
-    <main className="flex min-h-screen flex-col items-center bg-[#F5F7FB] px-6 pb-8 pt-10 text-[#0B1B3F]">
+    <main className="relative flex min-h-screen flex-col items-center bg-[#F5F7FB] px-6 pb-8 pt-10 text-[#0B1B3F]">
+      <div className="absolute right-5 top-5"><TipsToggle /></div>
       <div className="flex w-full max-w-[980px] flex-1 flex-col items-center justify-center gap-7 text-center">
         <div className="flex flex-col items-center gap-3.5">
           <StrandLogo />
@@ -43,7 +48,7 @@ export default function Opening() {
           ))}
         </div>
 
-        <button onClick={start} disabled={starting}
+        <button data-tour="open-salon" onClick={start} disabled={starting}
           className="inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-lg bg-[#1566F1] px-7 text-[16px] font-semibold text-white hover:bg-[#0F52C6] disabled:opacity-70">
           {starting ? "Opening the salon…" : "Open Strand & Co."}
           {!starting && (

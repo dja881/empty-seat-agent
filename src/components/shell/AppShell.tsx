@@ -1,5 +1,6 @@
 "use client";
 
+import { TipsToggle } from "@/components/tour/Tour";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -23,10 +24,11 @@ const AGENT_NAV = [
 ];
 
 /** Merchant dashboard frame: the salon's own workspace with the agent installed in it. */
-export function AppShell({ title, crumbs, actions, children }: {
+export function AppShell({ title, crumbs, actions, tips = true, children }: {
   title: string;
   crumbs?: string[];
   actions?: ReactNode;
+  tips?: boolean;        // false when the page places the Tips switch itself
   children: ReactNode;
 }) {
   const path = usePathname();
@@ -71,6 +73,7 @@ export function AppShell({ title, crumbs, actions, children }: {
             {crumbs && <div className="truncate text-[12px] text-muted">{crumbs.join(" / ")}</div>}
             <h1 className="truncate text-[15px] font-semibold leading-tight text-ink">{title}</h1>
           </div>
+          {tips && <TipsToggle />}
           {actions}
         </header>
         <main className="min-w-0 flex-1 p-4 sm:p-6">{children}</main>

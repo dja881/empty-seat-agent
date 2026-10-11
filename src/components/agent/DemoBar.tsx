@@ -1,5 +1,6 @@
 "use client";
 
+import { tour } from "@/lib/tour";
 import { useEffect, useRef, useState } from "react";
 import { MoreHorizontal, RotateCcw } from "lucide-react";
 import type { DemoState } from "@/lib/types";
@@ -43,7 +44,7 @@ export function DemoBar({ demo }: { demo: DemoState }) {
             <span>Scripted replies<span className="block text-[12px] text-muted">Safety net for recording</span></span>
             <input type="checkbox" checked={demo.scripted} onChange={(e) => post("/api/demo/state", { scripted: e.target.checked })} className="h-4 w-4 accent-[#1f5eff]" />
           </label>
-          <button onClick={async () => { await post("/api/demo/reset", {}); window.location.href = "/merchant"; }}
+          <button onClick={async () => { tour.restart(); await post("/api/demo/reset", {}); window.location.href = "/merchant"; }}
             className="flex w-full items-center gap-3 border-t border-line px-4 py-2.5 text-left text-[13px] font-medium text-danger hover:bg-background">
             <RotateCcw className="h-4 w-4" /> Reset demo to 9:00 am
           </button>

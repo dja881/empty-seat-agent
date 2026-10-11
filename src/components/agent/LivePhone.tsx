@@ -37,7 +37,7 @@ export function LivePhone({ initial = "c_riya" }: { initial?: string }) {
           Open <ExternalLink className="h-3 w-3" />
         </a>
       </div>
-      <div className="h-[690px] w-[330px] overflow-hidden rounded-[40px] border-[9px] border-[#1c1c1e] bg-black shadow-xl">
+      <div data-tour="customer-phone" className="h-[690px] w-[330px] overflow-hidden rounded-[40px] border-[9px] border-[#1c1c1e] bg-black shadow-xl">
         <iframe key={customer} src={`/phone/${customer}`} title={`${name}'s phone`} className="h-full w-full bg-white" />
       </div>
     </div>

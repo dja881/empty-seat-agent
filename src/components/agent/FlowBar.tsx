@@ -17,7 +17,7 @@ const STEPS: { id: Exclude<Stage, "idle">; label: string; href: string }[] = [
  * again; the Next button always moves the day forward from where it really is.
  */
 export function FlowBar({ stage, view, next, busy, extra }: {
-  stage: Stage; view: Stage; next: { label: string; run: () => void } | null; busy: string | null; extra?: React.ReactNode;
+  stage: Stage; view: Stage; next: { label: string; run: () => void; tour?: string } | null; busy: string | null; extra?: React.ReactNode;
 }) {
   const at = ORDER.indexOf(stage);
   return (
@@ -47,7 +47,7 @@ export function FlowBar({ stage, view, next, busy, extra }: {
       <div className="flex items-center gap-2">
         {extra}
         {next && (
-          <button onClick={next.run} disabled={!!busy}
+          <button data-tour={next.tour} onClick={next.run} disabled={!!busy}
             className="flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-[13.5px] font-semibold text-white hover:bg-[#1849d6] disabled:opacity-70">
             {busy ?? next.label} {!busy && <ArrowRight className="h-4 w-4" />}
           </button>

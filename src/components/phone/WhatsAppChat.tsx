@@ -151,7 +151,7 @@ function Bubble({ m, onLink, onCall }: { m: Message; onLink: (offerId: string) =
           </div>
         </div>
         {links.map((l) => (
-          <button key={l.offer_id} onClick={() => onLink(l.offer_id)}
+          <button key={l.offer_id} data-tour="pay-button" onClick={() => onLink(l.offer_id)}
             className="flex w-full items-center justify-center gap-1.5 border-t border-[#e9edef] py-2.5 text-[14px] font-medium text-[#027eb5]">
             <ExternalLink className="h-4 w-4" /> {l.label}
           </button>

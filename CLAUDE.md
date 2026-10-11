@@ -12,6 +12,7 @@ Read `PROGRESS.md` first for where things stand. Update it after each step.
 - The salon owner in the demo is **Daivik** (was Priya). Landing button reads "Open Strand & Co." (the salon name, not the owner's).
 - The hair-spa customer is **Shreya Kulkarni** (was Sneha Kulkarni; id is still `c_sneha_k`), so she is not confused with Sneha at the front desk.
 - Riya and her sister pay **once**: one link ("Pay ₹760 for both", ₹660 with HDFC) settles both seats. Two bookings, one Razorpay payment.
+- Guided tour: 10 tooltips (`src/lib/tour.ts`, `src/components/tour/Tour.tsx`), targets tagged with `data-tour`. The **Tips** switch in the top bar turns it on or off (saved in localStorage, on by default). Each screen declares its step with `useTourStep`.
 - Customers hear from **Sneha**, the front desk. Ray never speaks to customers in his own name.
 - Demo salon: **Strand & Co.**, Madhapur, Hyderabad. Internal merchant id is still `glow`.
 - Demo day is Tue 13 Oct 2026: 32 empty slots, 22 offered, 10 kept for walk-ins.
