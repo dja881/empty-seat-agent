@@ -62,9 +62,12 @@ function Merchant() {
 
   // The guided tour follows the day: which tip fits what is on screen right now.
   const has = (type: string) => events.some((e) => e.type === type);
+  // RAY has finished the briefing: nothing being said or worked out, and the last line is fully shown.
+  const lastLine = chat.lines[chat.lines.length - 1];
+  const briefed = chat.lines.length > 0 && chat.state !== "speaking" && chat.state !== "thinking" && (lastLine?.reveal ?? 1) >= 1;
   useTourStep(!data || busy || view !== (stage === "done" ? "live" : stage) ? null
     : stage === "idle" ? 2
-    : stage === "plan" ? (has("plan_edited") ? 4 : 3)
+    : stage === "plan" ? (!briefed ? null : has("plan_edited") ? 4 : 3)
     : stage === "customers" ? 5
     : stage === "done" || now >= 13 * 60 + 30 ? 9
     : has("paid") ? 8 : has("reply") ? 7 : 6);
@@ -167,7 +170,7 @@ function Merchant() {
             <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_350px]">
               <div className="min-w-0 space-y-3">
                 <FootfallAlert events={events} now={now} />
-                <AgentBar chat={chat} />
+                <AgentBar chat={chat} skip={String(events.find((e) => e.type === "footfall_alert")?.payload.text ?? "")} />
                 <PaneLabel title="Strand & Co.'s chairs" sub="What Daivik sees. Offers go out, customers pay, chairs turn green." />
                 <Calendar data={data} pxPerMin={0.85} />
                 <CalendarLegend />
@@ -196,8 +199,9 @@ function PaneLabel({ title, sub }: { title: string; sub: string }) {
 }
 
 /** During the day the agent sits above the board: its latest words, and a place to talk to it. */
-function AgentBar({ chat }: { chat: ReturnType<typeof useAgentChat> }) {
-  const last = [...chat.lines].reverse().find((l) => l.from === "agent");
+function AgentBar({ chat, skip }: { chat: ReturnType<typeof useAgentChat>; skip?: string }) {
+  // The 1:30 pm alert has its own card above, so the bar keeps the line before it.
+  const last = [...chat.lines].reverse().find((l) => l.from === "agent" && l.text !== skip);
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface px-4 py-3">
       <AgentOrb state={chat.state} size={30} />

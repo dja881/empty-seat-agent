@@ -29,7 +29,7 @@ export function DayStats({ data }: { data: BoardData }) {
     <div className="flex items-center divide-x divide-line">
       {stat(formatDay(data.demo.clock_at).replace(/^\w+, /, ""), formatClockFull(data.demo.clock_at))}
       {stat("Open slots", emptySlotCount(data.slots))}
-      {stat("Estimated extra revenue", rupees(revenue), "text-success")}
+      {stat("Extra revenue", rupees(revenue), "text-success")}
     </div>
   );
 }

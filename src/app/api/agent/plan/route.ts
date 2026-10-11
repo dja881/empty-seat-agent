@@ -1,3 +1,4 @@
+import { advanceClock } from "@/lib/server/clock";
 import { NextResponse } from "next/server";
 import { logEvent } from "@/lib/server/db";
 import { loadDay, timeLabel, parseHHMM } from "@/lib/server/day";
@@ -35,6 +36,7 @@ export async function POST(req: Request) {
       reply = "Already running. I'll keep you posted.";
     } else if (edit.approve) {
       await applyPlan(day, signals, plan);
+      await advanceClock("09:10"); // ten minutes with RAY, then on to choosing customers
       plan.status = "approved";
       reply = `Starting now. First messages go out at ${timeLabel(parseHHMM(plan.firstWaveAt))} from your WhatsApp number, signed by ${day.merchant.front_desk_name}.`;
       await logEvent("plan_approved", { released: plan.releasedUnits, maxDiscount: plan.maxDiscount });
@@ -52,6 +54,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ plan: day.demo.plan, reply: "", signals: summary(signals) });
   } else if (op === "approve") {
     await applyPlan(day, signals, plan);
+    await advanceClock("09:10"); // ten minutes with RAY, then on to choosing customers
     plan.status = "approved";
     reply = `Starting now. First messages go out at ${timeLabel(parseHHMM(plan.firstWaveAt))}.`;
     plan.history = [...plan.history, { from: "agent", text: reply }];

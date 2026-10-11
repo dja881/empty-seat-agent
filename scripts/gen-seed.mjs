@@ -45,7 +45,7 @@ const C = [
   ["c_tanvi", "Tanvi Shah", "target", 6.1, 49, 42, "afternoon", "svc_haircut", 460, 0.3, "Axis"],
   ["c_harsh", "Harsh Gupta", "target", 2.8, 34, 28, "morning", "svc_haircut", 450, 0.15, "ICICI"],
   // Lapsed: due long ago, lower response
-  ["c_kavya", "Kavya Iyer", "lapsed", 2.4, 70, 30, "afternoon", "svc_haircut", 450, 0.2, "HDFC"],
+  ["c_kavya", "Kavya Iyer", "recent", 2.4, 20, 30, "afternoon", "svc_haircut", 450, 0.2, "HDFC"],
   ["c_rohit", "Rohit Malhotra", "lapsed", 3.3, 95, 35, "afternoon", "svc_haircut", 450, 0.1, "SBI"],
   ["c_shalini", "Shalini Rao", "lapsed", 4.0, 120, 45, "afternoon", "svc_spa", 1200, 0.1, null],
   ["c_naveen", "Naveen Kumar", "lapsed", 1.4, 88, 30, "evening", "svc_haircut", 450, 0.15, "Kotak"],

@@ -66,13 +66,13 @@ function ReportBody({ r, topic, setTopic, hover, setHover, bHover, setBHover, ho
   const rev = Math.max(t.rev, 1);
 
   const kpis: { t: Topic; label: string; value: string; foot: string }[] = [
-    { t: "extra", label: "Estimated extra revenue", value: fmt(t.extra), foot: "After RAY's fee" },
+    { t: "extra", label: "Extra revenue", value: fmt(t.extra), foot: "After RAY's fee" },
     { t: "appts", label: "Paid appointments", value: String(r.sold), foot: `Out of ${r.released} offered` },
     { t: "spend", label: "Your discount spend", value: fmt(t.m), foot: t.b ? `+${fmt(t.b)} from partner offers` : "No partner offers used" },
   ];
 
   const slices = [
-    { key: "extra", label: "Estimated extra revenue", short: "Estimated extra", value: t.extra, color: BLUE },
+    { key: "extra", label: "Extra revenue", short: "Extra revenue", value: t.extra, color: BLUE },
     { key: "expected", label: "Expected without offers", short: "Expected anyway", value: t.exp, color: BLUE_MID },
     { key: "fee", label: "Agent fee", short: "Agent fee", value: t.fee, color: BLUE_PALE },
   ];
@@ -89,7 +89,6 @@ function ReportBody({ r, topic, setTopic, hover, setHover, bHover, setBHover, ho
 
   const segs = [
     { key: "spent", label: "Spent", v: bg.spent, color: BLUE, note: `${fmt(bg.spent)} committed this month, including ${fmt(t.m)} for today's appointments.` },
-    { key: "held", label: "Reserved", v: bg.reserved, color: BLUE_MID, note: `${fmt(bg.reserved)} set aside for live offers. It comes back if they expire unpaid.` },
     { key: "available", label: "Available", v: bg.available, color: TRACK, note: `${fmt(bg.available)} is free for new offers, about ${fmt(bg.perDayLeft)} a day for the rest of October.` },
   ];
   const budgetNote = segs.find((s) => s.key === bHover)?.note ?? `${fmt(bg.available)} is available for new offers this month.`;
@@ -307,8 +306,8 @@ function Details({ r, topic, close, hold, setHold, offered, planExtra, risk, ris
     budget: {
       kicker: "MONTHLY OFFER BUDGET", title: `${fmt(bg.available)} left for October`,
       intro: `At this pace you will use about ${fmt(bg.projected)} by 31 Oct, ${bg.projected <= bg.limit * 0.85 ? "well inside the cap" : bg.projected <= bg.limit ? "just inside the cap" : "above the cap, so RAY will slow down discounts"}.`,
-      ledger: [["Monthly limit", fmt(bg.limit)], ["Spent so far", `−${fmt(bg.spent)}`], ["Reserved for live offers", `−${fmt(bg.reserved)}`], ["Available", fmt(bg.available), true]],
-      days: true, note: "Reserved money returns to the budget if those offers expire unpaid.",
+      ledger: [["Monthly limit", fmt(bg.limit)], ["Spent so far", `−${fmt(bg.spent)}`], ["Available", fmt(bg.available), true]],
+      days: true,
     },
     plan: {
       kicker: "NEXT TUESDAY'S PLAN", title: w.came < w.kept - 1 ? "Keep fewer slots for walk-ins" : "Walk-in hold for next Tuesday",

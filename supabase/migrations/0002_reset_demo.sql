@@ -86,7 +86,7 @@ begin
     ('c_arun','glow','Arun Pillai','+91 98480 11781',1.7,('2026-10-13 12:00+05:30'::timestamptz - interval '29 days'),24,'evening','svc_beard',200,0.2,null,false,false),
     ('c_tanvi','glow','Tanvi Shah','+91 98480 11918',6.1,('2026-10-13 12:00+05:30'::timestamptz - interval '49 days'),42,'afternoon','svc_haircut',460,0.3,'Axis',false,false),
     ('c_harsh','glow','Harsh Gupta','+91 98480 12055',2.8,('2026-10-13 12:00+05:30'::timestamptz - interval '34 days'),28,'morning','svc_haircut',450,0.15,'ICICI',false,false),
-    ('c_kavya','glow','Kavya Iyer','+91 98480 12192',2.4,('2026-10-13 12:00+05:30'::timestamptz - interval '70 days'),30,'afternoon','svc_haircut',450,0.2,'HDFC',false,false),
+    ('c_kavya','glow','Kavya Iyer','+91 98480 12192',2.4,('2026-10-13 12:00+05:30'::timestamptz - interval '20 days'),30,'afternoon','svc_haircut',450,0.2,'HDFC',false,false),
     ('c_rohit','glow','Rohit Malhotra','+91 98480 12329',3.3,('2026-10-13 12:00+05:30'::timestamptz - interval '95 days'),35,'afternoon','svc_haircut',450,0.1,'SBI',false,false),
     ('c_shalini','glow','Shalini Rao','+91 98480 12466',4,('2026-10-13 12:00+05:30'::timestamptz - interval '120 days'),45,'afternoon','svc_spa',1200,0.1,null,false,false),
     ('c_naveen','glow','Naveen Kumar','+91 98480 12603',1.4,('2026-10-13 12:00+05:30'::timestamptz - interval '88 days'),30,'evening','svc_haircut',450,0.15,'Kotak',false,false),

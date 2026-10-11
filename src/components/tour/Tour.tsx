@@ -46,6 +46,7 @@ export function Tour() {
     const tick = () => {
       // A short pause first where the last action deserves a look (a chair turning green).
       if (Date.now() - started < (def.delay ?? 0)) return;
+      if (def.waitFor && !def.waitFor.some((w) => locate(w))) { setFound(null); return; }
       let hit = locate(name) ?? (def.fallback ? locate(def.fallback) : null);
       target.current = hit?.el ?? null;
       // Off screen: bring it into view (a few tries), and never dim the page for a target nobody can see.

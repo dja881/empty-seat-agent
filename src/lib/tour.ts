@@ -13,17 +13,18 @@ export interface TourStep {
   copy: string[];               // one line per target
   click?: boolean;              // Next presses the target (the step's action is a button)
   side?: "bottom" | "top" | "left" | "right";
+  waitFor?: string[];           // show only once one of these is on screen (e.g. the notification on the phone)
   delay?: number;               // ms to wait before showing, so the result of the last action is seen first
 }
 
 export const TOUR: TourStep[] = [
   { targets: ["open-salon"], copy: ["You're the owner of a 6-chair salon with 32 empty slots today. Let's fill them."], click: true },
   { targets: ["start-day"], copy: ["RAY reads today's bookings and the street outside, then suggests a plan."], click: true },
-  { targets: ["plan-input"], copy: ["Try changing the plan in plain words, like \"make it ₹100\"."], side: "top" },
+  { targets: ["plan-input"], copy: ["Try changing the plan in plain words, like \"make it ₹100\"."], side: "left", delay: 1200 },
   { targets: ["approve-plan"], copy: ["Nothing goes out until you approve."], click: true, side: "left" },
   { targets: ["offers-list", "send-offers"], click: true,
     copy: ["RAY picks customers who are due, nearby and free that afternoon. Regulars and VIPs are left out.", "Send the offers. They go out one by one on WhatsApp, in Sneha's name."] },
-  { targets: ["customer-phone"], copy: ["This is what your customer sees. Tap the message and reply as Riya."], side: "left" },
+  { targets: ["customer-phone"], copy: ["This is what your customer sees. Tap the message and reply as Riya."], side: "left", waitFor: ["phone-notification", "phone-chat"], delay: 900 },
   { targets: ["pay-button"], fallback: "customer-phone", copy: ["Pay in test mode. Watch the chair turn green on the left."], side: "left" },
   { targets: ["skip-time"], copy: ["Fast-forward the day. RAY adjusts when foot traffic drops."], click: true, delay: 4500 },
   { targets: ["close-day"], copy: ["See whether today made money."], click: true, delay: 6000 },

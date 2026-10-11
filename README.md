@@ -13,7 +13,7 @@ Demo salon: Strand & Co., Madhapur, Hyderabad. All data is synthetic.
 
 - Next.js on Vercel (screens and server routes holding secret keys)
 - Supabase: Postgres, Realtime, Storage
-- Qwen on Cerebras (OpenAI-compatible API) for the three agents
+- Qwen on Cerebras (OpenAI-compatible API) for the planner and the salon's customer agent
 - Razorpay test mode: Orders API, Checkout, `payment.captured` webhook, Refunds API
 - ElevenLabs for the agent's voice; browser speech recognition for the merchant
 

@@ -70,7 +70,8 @@ export async function GET() {
   // The fee is charged on the day's booking revenue, so 8% of the total shown is the fee shown.
   const dayFee = Math.round(sum("rev") * AGENT_FEE);
 
-  const released = (plan?.releasedUnits ?? 22) + (events.some((e) => e.type === "footfall_alert") ? 1 : 0);
+  // "Offered" is the number in the approved morning plan.
+  const released = plan?.releasedUnits ?? 22;
   const sentTo = new Set(offers.map((o) => `${o.customer_id}|${o.guest_name ?? ""}`)).size;
   const nearbyFill = Number((benchRes.data as { fill_rate: number } | null)?.fill_rate ?? 0.18);
 
@@ -108,8 +109,8 @@ export async function GET() {
     openSlots: emptySlotCount(day.slots as unknown as Slot[]),
     feeRate: AGENT_FEE,
     budget: {
-      limit: MONTHLY_BUDGET, spent, reserved, available: Math.max(0, MONTHLY_BUDGET - spent - reserved), projected,
-      perDayLeft: Math.round((MONTHLY_BUDGET - spent - reserved) / WEEKDAYS_LEFT / 10) * 10,
+      limit: MONTHLY_BUDGET, spent, reserved, available: Math.max(0, MONTHLY_BUDGET - spent), projected,
+      perDayLeft: Math.round((MONTHLY_BUDGET - spent) / WEEKDAYS_LEFT / 10) * 10,
       days: [...EARLIER_DAYS.map(([d, v]) => ({ label: d, value: v, today: false })), { label: "Today", value: spentToday, today: true }],
     },
     walkIns: { kept, came, byHour: walk, suggest: Math.min(kept, came + 1), window: plan?.heldHours ?? "3 to 6 pm" },

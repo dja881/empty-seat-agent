@@ -69,7 +69,7 @@ export function WhatsAppChat({ customerId, customerName }: { customerId: string;
   const lastSalon = [...messages].reverse().find((m) => m.sender === "salon");
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-[#efeae2]">
+    <div data-tour="phone-chat" className="flex h-full min-h-0 flex-col bg-[#efeae2]">
       {/* header */}
       <div className="flex shrink-0 items-center gap-2 bg-[#008069] px-2 py-2 text-white">
         <ArrowLeft className="h-5 w-5" />
