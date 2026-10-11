@@ -8,7 +8,7 @@ const BADGE: Record<string, [string, string]> = {
   offer_sent: ["Sent", "bg-background text-ink-2"],
   offer_moved: ["New time", "bg-background text-ink-2"],
   reply: ["Replied", "bg-accent-soft text-accent"],
-  footfall_alert: ["Released", "bg-accent-soft text-accent"],
+  footfall_alert: ["Live signal", "bg-accent-soft text-accent"],
   call_me: ["Call me", "bg-warn-soft text-warn"],
   walk_in: ["Walk-in", "bg-background text-ink-2"],
   refund: ["Refunded", "bg-warn-soft text-warn"],
@@ -33,7 +33,7 @@ function describe(e: AgentEvent): string | null {
     case "offer_sent": return p.wave ? `Wave ${p.wave} sent to ${p.count} customers` : `Offer to ${p.customer}: ${p.time}, ₹${p.price}${Number(p.party) > 1 ? ` × ${p.party}` : ""}`;
     case "offer_moved": return `${p.customer}'s ${p.from} slot was taken. Offered ${p.to} instead`;
     case "reply": return `${p.customer}: “${String(p.text).slice(0, 70)}”`;
-    case "footfall_alert": return String(p.text);
+    case "footfall_alert": return p.pct ? `Payments around you dropped ${p.pct}% below normal. Released the ${p.start} walk-in slot.` : String(p.text);
     case "call_me": return `${p.customer} asked for a call`;
     case "walk_in": return `Walk-in at ${p.start} on chair ${p.chair}, in held time`;
     case "refund": return `Refunded ${p.customer} ₹${p.amount}: ${p.reason}`;

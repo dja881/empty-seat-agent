@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X } from "lucide-react";
+import { ShieldCheck, X } from "lucide-react";
 import { AppShell } from "@/components/shell/AppShell";
 
 interface Service { id: string; name: string; duration_min: number; price: number; floor_price: number | null; discountable: boolean }
@@ -13,7 +13,7 @@ interface Merchant {
 
 const OFFERS = [
   { id: "pay_now", label: "Pay now to lock the slot", hint: "Discount only with prepayment" },
-  { id: "friend", label: "Bring a friend", hint: "Each person pays their own share" },
+  { id: "friend", label: "Bring a friend", hint: "One payment covers both seats" },
   { id: "bank", label: "Bank-funded offers", hint: "HDFC Bank · ₹50 off on HDFC cards · min ₹300", fixed: true },
   { id: "brand", label: "Brand-funded offers", hint: "L'Oréal Professionnel · ₹100 off hair spa", fixed: true },
   { id: "pass", label: "Off-peak pass (UPI Autopay)", hint: "Suggested from weekly patterns" },
@@ -41,7 +41,7 @@ export default function SettingsPage() {
   const setSvc = (id: string, patch: Partial<Service>) => setServices((xs) => xs.map((s) => (s.id === id ? { ...s, ...patch } : s)));
 
   return (
-    <AppShell title="Agent limits" crumbs={["Agents", "RAY", "Settings"]}
+    <AppShell title="Agent settings" crumbs={["Agents", "RAY · Empty Slot Agent"]}
       actions={
         <div className="flex gap-2">
           <button onClick={load} className="rounded-lg border border-line px-3 py-1.5 text-[13px] font-medium text-ink-2 hover:bg-background">Cancel</button>
@@ -52,6 +52,22 @@ export default function SettingsPage() {
       }>
       <p className="-mt-1 mb-4 text-[13px] text-muted">Every offer the agent makes is checked against these limits in code before it&apos;s sent.</p>
       {!m && <p className="text-muted">Loading…</p>}
+      {m && (
+        <div className="mb-4">
+          <Card title="Business type" sub="One engine for anything sold as time. Each business type sets its own unit, service lengths, walk-in pattern and booking source.">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {["Salon and spa", "Clinic", "Fitness studio", "Sports turf", "Restaurant"].map((b, i) => (
+                <div key={b} aria-disabled={i > 0} className={`flex items-center gap-3 rounded-lg border px-4 py-3 ${i === 0 ? "border-accent bg-accent-soft/50" : "border-line bg-background/60"}`}>
+                  <span className={`h-4 w-4 shrink-0 rounded-full border-2 ${i === 0 ? "border-accent bg-accent shadow-[inset_0_0_0_3px_white]" : "border-line-2"}`} />
+                  <span className={`flex-1 text-[14px] ${i === 0 ? "font-semibold text-ink" : "text-muted"}`}>{b}</span>
+                  {i === 0 ? <span className="text-[12.5px] font-medium text-accent">Selected</span>
+                    : <span className="rounded-full bg-warn-soft px-2 py-0.5 text-[11.5px] font-medium text-warn">Coming next</span>}
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      )}
       {m && (
         <div className="grid gap-4 xl:grid-cols-2">
           <div className="space-y-4">
@@ -149,6 +165,18 @@ export default function SettingsPage() {
               </div>
             </Card>
           </div>
+        </div>
+      )}
+      {m && (
+        <div className="mt-4">
+          <Card title="Data and privacy">
+            <div className="flex items-start gap-3 rounded-lg border border-line bg-background/60 px-4 py-3">
+              <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
+              <p className="text-[14px] leading-snug text-ink">
+                RAY uses Razorpay network signals: patterns aggregated across 10 or more nearby businesses. No customer-level or competitor data is shared.
+              </p>
+            </div>
+          </Card>
         </div>
       )}
       <style>{`.input{width:100%;border:1px solid var(--color-line);border-radius:8px;padding:6px 10px;font-size:13px;outline:none;background:white}.input:focus{border-color:var(--color-accent)}`}</style>

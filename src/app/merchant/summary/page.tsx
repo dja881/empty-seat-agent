@@ -42,7 +42,7 @@ export default function SummaryPage() {
   useTourStep(r ? 10 : null);
 
   return (
-    <AppShell title="RAY" crumbs={["Agents", "Empty seats"]}
+    <AppShell title="RAY · Empty Slot Agent" crumbs={["Agents"]}
       actions={data && <div className="flex items-center gap-4"><div className="hidden md:block"><DayStats data={data} /></div><DemoBar demo={data.demo} /></div>}>
       {data && (
         <div className="mb-4">
@@ -221,6 +221,24 @@ function ReportBody({ r, topic, setTopic, hover, setHover, bHover, setBHover, ho
           <button onClick={() => setTopic("plan")} className="min-h-10 rounded-lg bg-accent px-4 text-[14px] font-medium text-white hover:bg-[#1849d6]">
             {plan.state === "pending" ? "Review plan" : "Edit plan"}
           </button>
+        </div>
+      </section>
+
+      {/* how the day compares with similar salons on the Razorpay network */}
+      <section className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-line bg-surface px-6 py-5">
+        <div>
+          <div className="text-[12px] tracking-[.06em] text-muted">RAZORPAY NETWORK BENCHMARK</div>
+          <div className="mt-1 text-[16px] text-ink">
+            Similar salons nearby sold {r.nearbyTypical} empty slots today. You sold <b className="font-semibold text-success">{r.sold}</b>.
+          </div>
+        </div>
+        <div className="flex items-end gap-3" aria-hidden>
+          {([["Nearby", r.nearbyTypical, "bg-[#C5CEDB]"], ["You", r.sold, "bg-accent"]] as const).map(([label, v, cls]) => (
+            <div key={label} className="flex flex-col items-center gap-1">
+              <div className={`w-7 rounded ${cls}`} style={{ height: Math.max(8, Math.round((v / Math.max(r.nearbyTypical, r.sold, 1)) * 40)) }} />
+              <span className="text-[11px] text-muted">{label}</span>
+            </div>
+          ))}
         </div>
       </section>
     </div>

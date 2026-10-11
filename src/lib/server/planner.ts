@@ -9,11 +9,11 @@ const WEEKDAY = (d: string) => new Date(`${d}T12:00:00+05:30`).toLocaleDateStrin
 /** The spoken morning briefing, built from the plan's numbers. */
 export function briefingText(day: Day, plan: Plan) {
   const foot = plan.footfallPct < 0
-    ? `Foot traffic near you is ${Math.abs(plan.footfallPct)}% below a normal ${WEEKDAY(day.demo.demo_date)}`
-    : `Foot traffic near you is about normal for a ${WEEKDAY(day.demo.demo_date)}`;
-  const salons = plan.salonsPct <= -10 ? " and nearby salons are quiet too" : "";
-  return `Good morning ${day.merchant.owner_name}. You have ${plan.openUnits} open slots today, most between 1 and 5 pm. ` +
-    `${foot}${salons}. I expect walk-ins to take about ${plan.heldUnits}, so I'll offer the other ${plan.releasedUnits} at up to ₹${plan.maxDiscount} off.`;
+    ? `Razorpay payments near you are running ${Math.abs(plan.footfallPct)}% below a normal ${WEEKDAY(day.demo.demo_date)}`
+    : `Razorpay payments near you are about normal for a ${WEEKDAY(day.demo.demo_date)}`;
+  const salons = plan.salonsPct <= -10 ? ", and nearby salons are quiet too" : "";
+  return `Good morning, ${day.merchant.owner_name}. ${foot}${salons}. ` +
+    `I expect walk-ins to take about ${plan.heldUnits} slots, so I'll offer the other ${plan.releasedUnits} at up to ₹${plan.maxDiscount} off.`;
 }
 
 interface PlanEdit {

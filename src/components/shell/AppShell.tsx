@@ -16,7 +16,7 @@ const NAV = [
 ];
 
 const AGENT_NAV = [
-  { href: "/merchant", label: "RAY · Empty seats", icon: Armchair, live: true },
+  { href: "/merchant", label: "RAY · Empty Slot Agent", icon: Armchair, live: true },
   { href: "/merchant/front-desk", label: "Front desk", icon: Headset },
   { href: "/merchant/summary", label: "Daily report", icon: BarChart3 },
   { href: "/agents", label: "Negotiations", icon: Handshake },

@@ -110,7 +110,7 @@ function Merchant() {
   })();
 
   return (
-    <AppShell title="RAY" crumbs={["Agents", "Empty seats"]} tips={!data}
+    <AppShell title="RAY · Empty Slot Agent" crumbs={["Agents"]} tips={!data}
       actions={data && (
         <div className="flex items-center gap-3">
           <div className="hidden md:block"><DayStats data={data} /></div>
@@ -209,20 +209,35 @@ function AgentBar({ chat }: { chat: ReturnType<typeof useAgentChat> }) {
   );
 }
 
-/** The 1:30 pm moment: foot traffic is down, so RAY releases time he was holding. Shown for the next 90 minutes. */
+/**
+ * The 1:30 pm moment: payments around the salon drop, so RAY releases time he was holding.
+ * Highlighted for about 4 seconds when it happens, then it settles into a quiet card for the
+ * next 90 minutes of the day.
+ */
 function FootfallAlert({ events, now }: { events: AgentEvent[]; now: number }) {
   const e = events.find((x) => x.type === "footfall_alert");
+  const [hot, setHot] = useState(false);
+  const id = e?.id;
+  useEffect(() => {
+    if (!id) return;
+    setHot(true);
+    const t = setTimeout(() => setHot(false), 4000);
+    return () => clearTimeout(t);
+  }, [id]);
   if (!e) return null;
   const at = istMinutes(e.clock_at ?? e.created_at);
   if (now < at || now > at + 90) return null;
-  const p = e.payload as { pct?: number; start?: string; chair?: number };
+  const p = e.payload as { pct?: number; start?: string; text?: string };
   return (
-    <div className="flex items-center gap-4 rounded-xl border border-[#f5b800] bg-[#fff8e1] px-5 py-4 shadow-sm" style={{ animation: "alert-in .5s ease" }}>
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#f5b800] text-white"><TrendingDown className="h-6 w-6" /></span>
-      <div className="min-w-0 leading-snug">
-        <div className="text-[17px] font-semibold text-ink">Foot traffic near you is {p.pct}% below normal</div>
-        <div className="text-[14px] text-ink-2">Walk-ins are unlikely to fill it, so RAY released the {p.start} slot on Chair {p.chair} and is offering it now.</div>
-      </div>
+    <div className={`flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border bg-surface px-5 py-3.5 transition-all duration-700 ${hot ? "border-accent shadow-[0_0_0_4px_#dce6fd]" : "border-line"}`}
+      style={{ animation: "alert-in .5s ease" }}>
+      <TrendingDown className="h-5 w-5 shrink-0 text-accent" />
+      <p className="min-w-[240px] flex-1 text-[15.5px] leading-snug text-ink">
+        {p.pct ? `Payments around you just dropped ${p.pct}% below normal. I'm releasing the ${p.start} slot I was holding for walk-ins.` : p.text}
+      </p>
+      <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-accent-soft px-3 py-1 text-[12.5px] font-medium text-accent">
+        <span className="live-dot h-1.5 w-1.5 rounded-full bg-accent" /> Live signal · Razorpay network
+      </span>
       <style>{`@keyframes alert-in{from{opacity:0;transform:translateY(-10px) scale(.98)}to{opacity:1;transform:none}}`}</style>
     </div>
   );

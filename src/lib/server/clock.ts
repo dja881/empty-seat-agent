@@ -86,7 +86,7 @@ async function footfallCheck(day: Day) {
 
   const pct = Math.round((1 - lastHour) * 100 / 5) * 5;
   const when = timeLabel(istMinutes(held.start_at));
-  const text = `Foot traffic near you is ${pct}% below normal. Releasing the ${when} slot I was holding.`;
+  const text = `Payments around you just dropped ${pct}% below normal. I'm releasing the ${when} slot I was holding for walk-ins.`;
   await logEvent("footfall_alert", { text, chair: held.chair, start: when, ratio: lastHour, pct });
 
   // Wave 2 for the released slot: the best-ranked customer not yet offered today.

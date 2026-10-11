@@ -33,6 +33,9 @@ export default function Opening() {
         <div className="flex flex-col items-center gap-3.5">
           <StrandLogo />
           <div className="tnum text-[14px] text-[#5B6B85]">6 chairs · 10 am to 8 pm</div>
+          <div className="rounded-full border border-[#C9D8FB] bg-[#EEF3FE] px-4 py-1 text-[13px] text-[#1D4ED8]">
+            <b className="font-semibold">RAY</b> · Empty Slot Agent · from Razorpay Agent Studio
+          </div>
         </div>
 
         <div className="flex flex-col items-center gap-2.5 py-2">
