@@ -99,7 +99,7 @@ function Merchant() {
   })();
 
   return (
-    <AppShell title="Ray" crumbs={["Agents", "Empty seats"]}
+    <AppShell title="RAY" crumbs={["Agents", "Empty seats"]}
       actions={data && (
         <div className="flex items-center gap-3">
           <div className="hidden md:block"><DayStats data={data} /></div>
@@ -191,7 +191,7 @@ function AgentBar({ chat }: { chat: ReturnType<typeof useAgentChat> }) {
       <p className="min-w-[200px] flex-1 text-[14px] leading-snug text-ink">
         {last ? last.text : "Offers are out. I'll tell you when something changes."}
       </p>
-      <div className="w-full md:w-[360px]"><AskBar chat={chat} placeholder="Ask Ray, e.g. how are we doing?" compact /></div>
+      <div className="w-full md:w-[360px]"><AskBar chat={chat} placeholder="Ask RAY, e.g. how are we doing?" compact /></div>
     </div>
   );
 }

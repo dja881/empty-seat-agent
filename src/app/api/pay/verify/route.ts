@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { verifyCheckoutSignature } from "@/lib/server/razorpay";
-import { fundedFor, getOffer, settle } from "@/lib/server/settle";
+import { getOffer, settleGroup } from "@/lib/server/settle";
 
 /**
  * Checkout success handler: verify Razorpay's signature, check the order belongs to this
@@ -15,10 +15,8 @@ export async function POST(req: Request) {
   if (o.razorpay_order_id !== razorpay_order_id) {
     return NextResponse.json({ error: "order does not match offer" }, { status: 400 });
   }
-  const funded = fundedFor(o, variant);
-  const { result } = await settle(offerId, {
-    orderId: razorpay_order_id, paymentId: razorpay_payment_id,
-    amount: o.price - funded, funded, simulated: false,
+  const { result } = await settleGroup(offerId, {
+    orderId: razorpay_order_id, paymentId: razorpay_payment_id, variant, simulated: false,
   });
   return NextResponse.json({ result });
 }

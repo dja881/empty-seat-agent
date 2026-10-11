@@ -26,6 +26,35 @@ export function fundedFor(o: Pick<OfferDetail, "funded_amount" | "funder_kind">,
   return o.funder_kind === "brand" || variant === "bank" ? o.funded_amount : 0;
 }
 
+/**
+ * The offers one payment covers: the offer itself, plus the other seats still open in its group
+ * (a customer bringing a friend pays once for both). Lead seat first.
+ */
+export async function groupOf(o: OfferDetail): Promise<OfferDetail[]> {
+  if (!o.group_id) return [o];
+  const rows = must(await db.from("offers").select("*, customers(name, phone), services(name, duration_min)")
+    .eq("group_id", o.group_id).in("status", ["sent", "link_sent"]), "group") as OfferDetail[];
+  const rest = rows.filter((r) => r.id !== o.id).sort((a, b) => Number(!!a.guest_name) - Number(!!b.guest_name));
+  return [o, ...rest];
+}
+
+/** Settle one payment against every seat it covers. Amounts come from the offers, never the caller. */
+export async function settleGroup(offerId: string, p: { orderId: string | null; paymentId: string | null; variant: string; simulated: boolean }) {
+  const seats = await groupOf(await getOffer(offerId));
+  let first: Awaited<ReturnType<typeof settle>> | null = null;
+  for (const [i, seat] of seats.entries()) {
+    const funded = fundedFor(seat, p.variant);
+    // One Razorpay payment, one payments row per seat: later seats carry the id with a seat suffix.
+    const r = await settle(seat.id, {
+      orderId: p.orderId, paymentId: p.paymentId && i > 0 ? `${p.paymentId}_seat${i + 1}` : p.paymentId,
+      refundId: p.paymentId, amount: seat.price - funded, funded, simulated: p.simulated,
+    });
+    first ??= r;
+    if (i === 0 && r.result === "duplicate") break; // already settled (webhook after Checkout)
+  }
+  return first!;
+}
+
 /** Is the offer's time still open on its chair? */
 export function stillOpen(day: Day, o: OfferDetail) {
   const a = istMinutes(o.start_at), b = istMinutes(o.end_at);
@@ -51,7 +80,7 @@ export function alternatives(day: Day, o: OfferDetail, n = 3) {
  */
 export async function settle(offerId: string, p: {
   orderId: string | null; paymentId: string | null; amount: number; funded: number; simulated: boolean;
-  channel?: "online" | "front_desk";
+  channel?: "online" | "front_desk"; refundId?: string | null;
 }) {
   const result = must(await db.rpc("settle_offer", {
     p_offer: offerId, p_order: p.orderId, p_payment: p.paymentId,
@@ -74,7 +103,7 @@ export async function settle(offerId: string, p: {
   if (result === "taken") {
     if (p.paymentId && !p.simulated) {
       try {
-        await refundPayment(p.paymentId, p.amount, "slot already booked");
+        await refundPayment(p.refundId ?? p.paymentId, p.amount, "slot already booked");
         await db.from("payments").update({ status: "refunded" }).eq("razorpay_payment_id", p.paymentId);
       } catch (err) {
         console.error("refund failed", err);

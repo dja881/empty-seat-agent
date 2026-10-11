@@ -177,7 +177,7 @@ export function CalendarLegend() {
       <span className="flex items-center gap-1.5">{sw("hatch")}Kept for walk-ins</span>
       <span className="flex items-center gap-1.5">{sw("border border-dashed border-accent/60 bg-accent-soft")}Offered</span>
       <span className="flex items-center gap-1.5">{sw("border-2 border-dashed border-sold bg-sold-soft")}Customer about to pay</span>
-      <span className="flex items-center gap-1.5">{sw("bg-sold")}Sold by Ray</span>
+      <span className="flex items-center gap-1.5">{sw("bg-sold")}Sold by RAY</span>
     </div>
   );
 }

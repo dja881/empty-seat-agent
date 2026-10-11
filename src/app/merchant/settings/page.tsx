@@ -41,7 +41,7 @@ export default function SettingsPage() {
   const setSvc = (id: string, patch: Partial<Service>) => setServices((xs) => xs.map((s) => (s.id === id ? { ...s, ...patch } : s)));
 
   return (
-    <AppShell title="Agent limits" crumbs={["Agents", "Ray", "Settings"]}
+    <AppShell title="Agent limits" crumbs={["Agents", "RAY", "Settings"]}
       actions={
         <div className="flex gap-2">
           <button onClick={load} className="rounded-lg border border-line px-3 py-1.5 text-[13px] font-medium text-ink-2 hover:bg-background">Cancel</button>

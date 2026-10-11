@@ -100,7 +100,7 @@ Rules:
 - ${funding?.kind === "brand"
       ? `${funding.funder} funds ₹${funding.amount} off this service on any payment method. Quote the customer the price minus ₹${funding.amount}; the "price" in your JSON stays what the salon receives.`
       : `A bank offer gives ₹${funding?.amount ?? 50} off on ${funding?.issuer ?? "HDFC"} cards at checkout; mention it when relevant.`}
-- Payment links are attached automatically to any offer you make; say "here's the link" or "here are both links".
+- Payment links are attached automatically to any offer you make; say "here's the link" (one link, even for two people: they pay together).
 - If they ask for something you can't do, want to talk, or complain, use alert_front_desk and say you'll call them.
 - If the time they want is taken, offer the nearest open time or add_to_waitlist.
 
@@ -170,21 +170,23 @@ async function execute(day: Day, customer: CustomerRow, out: AgentOutput, open: 
     message = await rewrite(day, customer, { service, start: slot.start, price, party, original: out.message });
   }
 
-  // Supersede earlier offers, then one offer per seat, each paid separately.
+  // Supersede earlier offers, then one offer per seat. A party pays once: one link covers every seat.
   await cancelOpenOffers(customer.id);
   const groupId = party > 1 ? crypto.randomUUID() : null;
   const guest = party > 1 ? (out.guest_name?.trim() || `${first(customer.name)}'s guest`) : null;
   const links: LinkButton[] = [];
+  const ids: string[] = [];
   const freshDay = day; // chairs are picked from the same snapshot used to validate
   for (let seat = 0; seat < party; seat++) {
     const { offer } = await createOffer(freshDay, {
       customer, service, chair: slot.chairs[seat], start: slot.start, end: slot.start + service.duration_min,
       price, wave: current ? 2 : 1, guestName: seat === 0 ? null : guest, groupId, steps,
     });
-    const pay = price - (brandFunded ? offer.funded_amount : 0);
-    links.push({ offer_id: offer.id, label: party > 1 ? `${seat === 0 ? first(customer.name) : guest} · Pay ₹${pay}` : `Pay ₹${pay}` });
+    const pay = (price - (brandFunded ? offer.funded_amount : 0)) * party;
+    ids.push(offer.id);
+    if (seat === 0) links.push({ offer_id: offer.id, label: party > 1 ? `Pay ₹${pay} for both` : `Pay ₹${pay}` });
   }
-  await db.from("offers").update({ status: "link_sent" }).in("id", links.map((l) => l.offer_id));
+  await db.from("offers").update({ status: "link_sent" }).in("id", ids);
   await refreshOffered();
   await logEvent("offer_sent", { customer: customer.name, time: timeLabel(slot.start), price, party, adjusted });
   return postMessage(day, customer.id, "salon", message, { links, by });
@@ -195,10 +197,10 @@ async function rewrite(day: Day, customer: CustomerRow, f: { service: ServiceRow
   const funding = anyFunding(day, f.price, f.service.id);
   const facts = `${f.party > 1 ? `${f.party} people, ` : ""}${f.service.name} at ${timeLabel(f.start)} today, ${priceLine(f.price, funding, f.party > 1)}`;
   const res = await llmJson<{ message: string }>([
-    { role: "system", content: `You are ${day.merchant.front_desk_name} at ${day.merchant.name} on WhatsApp. Rewrite the draft so it states exactly these facts and nothing else about price or time: ${facts}. Mention the payment link${f.party > 1 ? "s" : ""}. 1 to 2 short sentences, no emojis. JSON: {"message": "..."}` },
+    { role: "system", content: `You are ${day.merchant.front_desk_name} at ${day.merchant.name} on WhatsApp. Rewrite the draft so it states exactly these facts and nothing else about price or time: ${facts}. Mention the payment link${f.party > 1 ? " (one link, they pay together)" : ""}. 1 to 2 short sentences, no emojis. JSON: {"message": "..."}` },
     { role: "user", content: f.original || "(no draft)" },
   ], { temperature: 0.2 });
-  return res?.message || `${facts}. Here ${f.party > 1 ? "are both links" : "is the link"} to pay and lock it.`;
+  return res?.message || `${facts}. Here is the link to pay${f.party > 1 ? " for both" : ""} and lock it.`;
 }
 
 /* ---------------- scripted switch ---------------- */
@@ -219,7 +221,7 @@ function scriptedReply(day: Day, customer: CustomerRow, text: string, open: Open
       action: friend ? "add_friend" : "offer_other_time", time, party_size: friend ? 2 : 1, price,
       service_id: current?.service_id ?? customer.usual_service_id,
       message: friend
-        ? `Yes, ${timeLabel(parseHHMM(time))} for two. ${priceLine(price, funding, true)}. Here are both links.`
+        ? `Yes, ${timeLabel(parseHHMM(time))} for two. ${priceLine(price, funding, true)}. Here is one link to pay for both.`
         : `Yes, ${timeLabel(parseHHMM(time))} works. ${priceLine(price, funding)}. Here's the link.`,
     };
   }

@@ -10,6 +10,7 @@ import { useDemoClock } from "@/lib/useDemoClock";
 interface OfferView {
   id: string; status: string; open: boolean; customer: string; phone: string; service: string;
   start: number; stylist: string; chair: number; price: number; funded: number; funder: string | null; funderKind: "bank" | "brand" | null;
+  seats: { name: string; chair: number; stylist: string }[];
   salon: { name: string; frontDesk: string; phone: string };
   alternatives: { start: number; label: string; stylist: string; price: number }[];
 }
@@ -66,7 +67,7 @@ function PayView({ offerId }: { offerId: string }) {
       amount: order.amount * 100,
       currency: "INR",
       name: offer.salon.name,
-      description: `${offer.service} · ${label(offer.start)} with ${offer.stylist}`,
+      description: `${offer.seats.length > 1 ? `${offer.seats.length} × ` : ""}${offer.service} · ${label(offer.start)}`,
       image: location.protocol === "https:" ? `${location.origin}/strand-mark.png` : undefined,
       prefill: { name: order.customer, contact: order.phone },
       notes: { offer_id: offerId },
@@ -105,6 +106,7 @@ function PayView({ offerId }: { offerId: string }) {
   }
 
   const brand = offer?.funderKind === "brand" && offer.funded > 0;
+  const two = (offer?.seats?.length ?? 1) > 1;
   const amount = offer ? offer.price - (brand || variant === "bank" ? offer.funded : 0) : 0;
 
   return (
@@ -140,8 +142,10 @@ function PayView({ offerId }: { offerId: string }) {
           <div className="flex flex-1 flex-col gap-4 p-4">
             <div className="rounded-xl border border-[#eaecf0] bg-white p-4">
               <div className="text-[12px] font-medium uppercase tracking-wide text-[#667085]">Your booking</div>
-              <Row icon={<Scissors className="h-4 w-4" />} text={offer.service} sub={`for ${offer.customer}`} />
-              <Row icon={<CalendarClock className="h-4 w-4" />} text={`Today, ${label(offer.start)}`} sub={`with ${offer.stylist} · Chair ${offer.chair}`} />
+              <Row icon={<Scissors className="h-4 w-4" />} text={two ? `${offer.seats.length} × ${offer.service}` : offer.service}
+                sub={`for ${offer.seats.map((x) => x.name).join(" and ") || offer.customer}`} />
+              <Row icon={<CalendarClock className="h-4 w-4" />} text={`Today, ${label(offer.start)}`}
+                sub={two ? `Chairs ${offer.seats.map((x) => x.chair).join(" and ")} · one payment for both` : `with ${offer.stylist} · Chair ${offer.chair}`} />
               <Row icon={<Clock className="h-4 w-4" />} text="Held for you until you pay" sub="The slot locks the moment payment succeeds" />
             </div>
 

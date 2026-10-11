@@ -2,7 +2,7 @@
 
 Razorpay × ISB AI PM Build Challenge, Track 2 (Recover and Grow with AI).
 
-Ray, Razorpay's AI agent, running an empty-seat skill: it sells a salon's unfilled chair time to its own customers, the way airlines
+RAY, Razorpay's AI agent, running an empty-seat skill: it sells a salon's unfilled chair time to its own customers, the way airlines
 sell their last seats. It agrees a plan with the owner each morning, sends one-to-one offers in the
 receptionist's name, negotiates within the owner's limits, and locks each slot the moment the
 customer pays through Razorpay.

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { verifyWebhookSignature } from "@/lib/server/razorpay";
-import { settle } from "@/lib/server/settle";
+import { settleGroup } from "@/lib/server/settle";
 
 /**
  * payment.captured webhook: the authoritative path in production. Safe to receive after
@@ -16,10 +16,7 @@ export async function POST(req: Request) {
     const p = event.payload.payment.entity;
     const offerId = p.notes?.offer_id;
     if (offerId) {
-      await settle(offerId, {
-        orderId: p.order_id, paymentId: p.id, amount: Math.round(p.amount / 100),
-        funded: Number(p.notes?.funded ?? 0), simulated: false,
-      });
+      await settleGroup(offerId, { orderId: p.order_id, paymentId: p.id, variant: p.notes?.variant ?? "any", simulated: false });
     }
   }
   return NextResponse.json({ ok: true });
