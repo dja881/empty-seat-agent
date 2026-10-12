@@ -56,7 +56,7 @@ export default function SettingsPage() {
         <div className="mb-4">
           <Card title="Business type" sub="One engine for anything sold as time. Each business type sets its own unit, service lengths, walk-in pattern and booking source.">
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              {["Salon and spa", "Clinic", "Fitness studio", "Sports turf", "Restaurant"].map((b, i) => (
+              {["Salon and spa", "Fitness studio", "Sports turf", "Restaurant"].map((b, i) => (
                 <div key={b} aria-disabled={i > 0} className={`flex items-center gap-3 rounded-lg border px-4 py-3 ${i === 0 ? "border-accent bg-accent-soft/50" : "border-line bg-background/60"}`}>
                   <span className={`h-4 w-4 shrink-0 rounded-full border-2 ${i === 0 ? "border-accent bg-accent shadow-[inset_0_0_0_3px_white]" : "border-line-2"}`} />
                   <span className={`flex-1 text-[14px] ${i === 0 ? "font-semibold text-ink" : "text-muted"}`}>{b}</span>
