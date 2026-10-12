@@ -118,13 +118,13 @@ export function Tour() {
   );
 }
 
-/** "Tips" switch for the top bar: tooltips on or off, remembered across reloads. */
+/** "Guided tour" switch for the top bar: tooltips on or off, remembered across reloads. */
 export function TipsToggle() {
   const { on } = useTour();
   return (
-    <button type="button" aria-pressed={on} aria-label="Tips" onClick={() => tour.setOn(!on)} title={on ? "Hide the guided tips" : "Show the guided tips"}
+    <button type="button" aria-pressed={on} aria-label="Guided tour" onClick={() => tour.setOn(!on)} title={on ? "Turn the guided tour off" : "Turn the guided tour on"}
       className="flex h-8 shrink-0 items-center gap-2 rounded-lg border border-line bg-surface pl-3 pr-2 text-[13px] font-medium text-ink-2 hover:bg-background">
-      Tips
+      Guided tour
       <span className={`relative inline-block h-[18px] w-[30px] rounded-full transition-colors ${on ? "bg-[#2563EB]" : "bg-[#C5CEDB]"}`}>
         <i className={`absolute top-[2px] h-[14px] w-[14px] rounded-full bg-white shadow transition-all ${on ? "left-[14px]" : "left-[2px]"}`} />
       </span>
