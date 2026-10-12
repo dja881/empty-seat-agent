@@ -23,7 +23,7 @@ export const TOUR: TourStep[] = [
   { targets: ["plan-input"], copy: ["Try changing the plan in plain words, like \"make it ₹100\"."], side: "left", delay: 1200 },
   { targets: ["approve-plan"], copy: ["Nothing goes out until you approve."], click: true, side: "left" },
   { targets: ["offers-list", "send-offers"], click: true,
-    copy: ["RAY picks customers who are due for a visit, live nearby and usually come in the afternoon. Regulars and VIPs are left out, so nobody who already pays full price gets a discount.", "Send the offers. They go out one by one on WhatsApp, in Sneha's name."] },
+    copy: ["RAY picks customers who are due for a visit. Regulars and VIPs are left out.", "Send the offers. They go out one by one on WhatsApp, in Sneha's name."] },
   { targets: ["customer-phone"], copy: ["This is what your customer sees. Tap the message and reply as Riya."], side: "left", waitFor: ["phone-notification", "phone-chat"], delay: 900 },
   { targets: ["pay-button"], fallback: "customer-phone", copy: ["Pay in test mode. Watch the chair turn green on the left."], side: "left" },
   { targets: ["skip-time"], copy: ["Fast-forward the day. RAY adjusts when foot traffic drops."], click: true, delay: 4500 },

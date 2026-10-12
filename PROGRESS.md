@@ -27,7 +27,7 @@ _Last updated: 11 Oct 2026_
 - [ ] Product note and 90-second video. Any "₹150 funded by HDFC" must become "₹200 from partner offers".
 
 ### Claude can do once confirmed
-- [ ] `BUILD_LOG.md`: add 10 to 11 Oct work, and fix the 9 Oct row that still says "₹150 HDFC-funded".
+- [x] `BUILD_LOG.md` brought up to date to 12 Oct (13 Oct). The top section, decisions before the build, is still empty and needs the user's list.
 - [ ] `README.md`: data section lists only migrations 0001 to 0003.
 - [ ] Verify a production build (only when the dev server is stopped, or on Vercel).
 - [ ] "Approve next Tuesday's plan" in the report only updates the screen; it is not saved.
@@ -62,3 +62,4 @@ _Last updated: 11 Oct 2026_
 - 13 Oct: Top-bar switch renamed from "Tips" to "Guided tour" (label, tooltip and screen-reader name). Behaviour and the saved setting are unchanged. Label-only; type-check and lint passed, no regression run.
 - 13 Oct: Guided tour now starts on for every new visit. Switching it off (or Skip tour) lasts only for that browser tab, reloads included; the old permanent "off" setting is cleared. Checked on the live site: with an old "off" saved, the opening screen loads with the switch on and step 1 showing. Did not re-run the regression (no logic outside the tour changed, and the demo is shared).
 - 13 Oct: Tour step 5 copy rewritten to match what the ranking really uses: "RAY picks customers who are due for a visit, live nearby and usually come in the afternoon. Regulars and VIPs are left out, so nobody who already pays full price gets a discount." The old line claimed customers were "free that afternoon", which RAY cannot know. Copy-only; type-check and lint passed.
+- 13 Oct: Tour step 5 shortened at the user's request to "RAY picks customers who are due for a visit. Regulars and VIPs are left out." Build log brought up to date with 14 rows for 9 to 12 Oct; the "Decision I made" column is drawn from what the user said in the session and needs their read-through.
