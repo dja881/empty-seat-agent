@@ -36,15 +36,19 @@ let state: State = { on: true, auto: null, manual: null, sub: 0, finished: false
 const SERVER: State = state;
 const listeners = new Set<() => void>();
 const set = (patch: Partial<State>) => { state = { ...state, ...patch }; listeners.forEach((l) => l()); };
-// The Tips choice lasts across visits; "finished" only until the demo is restarted.
-const remember = (on: boolean) => { try { localStorage.setItem("tips", on ? "on" : "off"); } catch {} };
+// The guided tour is on for every new visit. Switching it off lasts for this browser tab only
+// (reloads included), so a returning visitor or a judge always starts with it on.
+const remember = (on: boolean) => { try { if (on) sessionStorage.removeItem("tour-off"); else sessionStorage.setItem("tour-off", "1"); } catch {} };
 const markFinished = (done: boolean) => { try { if (done) sessionStorage.setItem("tour-finished", "1"); else sessionStorage.removeItem("tour-finished"); } catch {} };
 
 let loaded = false;
 function load() {
   if (loaded || typeof window === "undefined") return;
   loaded = true;
-  try { set({ on: localStorage.getItem("tips") !== "off", finished: sessionStorage.getItem("tour-finished") === "1" }); } catch {}
+  try {
+    localStorage.removeItem("tips"); // older builds remembered "off" forever
+    set({ on: sessionStorage.getItem("tour-off") !== "1", finished: sessionStorage.getItem("tour-finished") === "1" });
+  } catch {}
 }
 
 export const tour = {
