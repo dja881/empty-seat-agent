@@ -8,7 +8,7 @@ Read `PROGRESS.md` first for where things stand. Update it after each step.
 
 ## Current facts (these override the PRD)
 
-- **Live site: https://empty-seat-agent.vercel.app** (Vercel project `empty-seat-agent`, team `dja`). Every push to `main` deploys automatically. It shares the one Supabase database with local dev, so two people using the demo at once interfere (a Restart or "Open Strand & Co." wipes the other's day). The Vercel connector cannot see or create the project. Razorpay webhook: skipped by the user's choice.
+- **Live site: https://empty-seat-agent.vercel.app** (Vercel project `empty-seat-agent`, team `dja`). Every push to `main` deploys automatically. Functions run in Mumbai (`vercel.json`, region bom1) because the Supabase database is in ap-south-1; in the default US region every action took 2 to 8 seconds. It shares the one Supabase database with local dev, so two people using the demo at once interfere (a Restart or "Open Strand & Co." wipes the other's day). The Vercel connector cannot see or create the project. Razorpay webhook: skipped by the user's choice.
 
 - The agent is written **RAY** on screen (Razorpay's agent; "Ray" only in code comments and the model prompt). Voice: ElevenLabs **Brian** (`nPczCjzI2devNBz1zQrb`).
 - The salon owner in the demo is **Daivik** (was Priya). Landing button reads "Open Strand & Co." (the salon name, not the owner's).
