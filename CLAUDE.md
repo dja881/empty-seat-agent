@@ -58,6 +58,7 @@ Read `PROGRESS.md` first for where things stand. Update it after each step.
 - Sneha's price only comes down when the customer raises price. No unasked discounts.
 
 ### Working with the user
+- Before running the regression, a timing test or a reset (local or live), tell the user and wait for a yes. They all write to the one shared database, so they show up as payments and restarts in whatever the user has open. This ruined a recording attempt on 12 Oct.
 - Ask questions in plain text, not with a question dialog.
 - Keep `BUILD_LOG.md` up to date as work is done. The top section (decisions before the build) comes from the user.
 - Be upfront about what was tested and what was not.
