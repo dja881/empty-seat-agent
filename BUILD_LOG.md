@@ -29,7 +29,19 @@ Claude Code also worked from two files I had it keep in the repository: a standi
 
 ### Representative instructions
 
-These summarise the instructions used during the build; they are not verbatim prompt transcripts.
+These are reconstructed from the instructions and decisions I gave during the project. They are not verbatim prompt transcripts.
+
+**Turning customer research into a trust requirement**
+
+> Customers told me an unexpected discount link feels like a scam and they would rather call the receptionist. I want the offer to feel like an interaction with their existing salon. Work through the journey from receiving the message to paying: use the salon's identity, sign it with the receptionist's name and keep a clear option to call. Identify where someone might hesitate and how the front desk can help them complete the same booking. Keep the experience inside the existing customer relationship.
+
+**Defining success from the owner's perspective**
+
+> At 8 pm, the owner needs to know whether RAY actually added money, what it cost, whether offers stayed within budget and what should change next. Build the report around those questions. Don't count every agent booking as incremental revenue: some customers would have booked anyway. Stress-test the calculation for discounts, fees, bank funding and refunds, and distinguish estimates from recorded payments. Keep the main screen simple, with the calculation available on demand.
+
+**Cutting an impressive feature to protect the core journey**
+
+> I'm removing agent-to-agent negotiation from the submission because it distracts from the problem we are trying to prove. The demo should follow one salon through approving a plan, reaching suitable customers, collecting payment and reviewing the result. Review each screen against that journey. Flag anything that adds explanation or interaction without helping the owner fill empty time, control the offers or understand the outcome. Show me the trade-offs before changing the scope.
 
 **Specification review**
 
@@ -46,22 +58,6 @@ These summarise the instructions used during the build; they are not verbatim pr
 **Review-driven fixes**
 
 > Check each walkthrough finding against the current code before changing it. Fix reproducible issues, preserve the approved journey and run the demo checks before merging.
-
-### Representative instructions reconstructed from my product decisions
-
-These are reconstructed from the decisions I made during the project. They are not exact messages.
-
-**1. Turning customer research into a trust requirement**
-
-> Customers told me an unexpected discount link feels like a scam and they would rather call the receptionist. I want the offer to feel like an interaction with their existing salon. Work through the journey from receiving the message to paying: use the salon's identity, sign it with the receptionist's name and keep a clear option to call. Identify where someone might hesitate and how the front desk can help them complete the same booking. Keep the experience inside the existing customer relationship.
-
-**2. Defining success from the owner's perspective**
-
-> At 8 pm, the owner needs to know whether RAY actually added money, what it cost, whether offers stayed within budget and what should change next. Build the report around those questions. Don't count every agent booking as incremental revenue: some customers would have booked anyway. Stress-test the calculation for discounts, fees, bank funding and refunds, and distinguish estimates from recorded payments. Keep the main screen simple, with the calculation available on demand.
-
-**3. Cutting an impressive feature to protect the core journey**
-
-> I'm removing agent-to-agent negotiation from the submission because it distracts from the problem we are trying to prove. The demo should follow one salon through approving a plan, reaching suitable customers, collecting payment and reviewing the result. Review each screen against that journey. Flag anything that adds explanation or interaction without helping the owner fill empty time, control the offers or understand the outcome. Show me the trade-offs before changing the scope.
 
 ### Agent setup inside RAY
 
