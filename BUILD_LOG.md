@@ -1,13 +1,12 @@
 # RAY · AI build log
 
-**Daivik John Alva | Razorpay × ISB AI PM Build Challenge**  
-**Research and specification: 23 September–8 October | Build and iteration: 9–12 October | Submission review: 13 October 2026**
+**Daivik John Alva | Razorpay × ISB AI PM Build Challenge**
 
 ## How AI multiplied my output
 
-I used AI to shorten the distance between a product decision and a version I could test. I chose the problem, merchant segment, business logic and scope. AI helped research those choices, challenged the assumptions, and wrote most of the code. That gave me more time to walk through the product, reject weak implementations and refine the experience.
+I chose the problem, merchant segment, business logic and scope. AI helped research those choices, challenged the assumptions, and wrote most of the code. That gave me more time to walk through the product, reject weak implementations and refine the experience.
 
-The clearest result was the four-day build window, from 9 to 12 October. Starting from the PRD and specification I had developed, I used AI to build and revise a deployed prototype covering planning, customer selection, conversation, payment and reporting. During that window, I also changed the interface, redesigned the report, simplified group payments and removed a feature that distracted from the main journey.
+Starting from the PRD and specification I had developed, I used AI to build and revise a deployed prototype covering planning, customer selection, conversation, payment and reporting. During the build, I also changed the interface, redesigned the report, simplified group payments and removed a feature that distracted from the main journey.
 
 ### Output in numbers
 
@@ -20,7 +19,6 @@ The clearest result was the four-day build window, from 9 to 12 October. Startin
 | **2 illustrative funding types** | Bank-funded and brand-funded offers used different eligibility rules. AI implemented those rules from the behaviour I specified. |
 | **1 checkout for 2 appointments** | After I rejected separate payments for a customer and her guest, AI changed the payment flow while retaining both bookings. |
 | **A ₹60 discrepancy traced to model behaviour** | AI helped identify an unsolicited discount, then implemented my rule that price should only fall when the customer raises price. The demo test was updated to flag regressions. |
-| **Reported action latency reduced from 2–8 seconds to under 1 second** | After I chose to record the live deployment, Claude Code diagnosed the server/database region mismatch and moved the app server to Mumbai. These were observations from the build, not a controlled benchmark. |
 
 These are counts and outcomes recorded during the project. They demonstrate the amount of work completed with AI; I did not run a timed manual comparison to establish an exact 10× speedup.
 
@@ -28,12 +26,12 @@ These are counts and outcomes recorded during the project. They demonstrate the 
 
 | Workstream | My direction and decisions | AI's work | What this enabled |
 | --- | --- | --- | --- |
-| **Research and specification · 23 Sep–8 Oct** | I conducted customer and owner conversations, explored the opportunity, tried Razorpay's existing agents and chose the salon use case. I set the product logic and demo requirements. | Claude supported secondary research and helped structure and stress-test the PRD. It raised inconsistencies in customer counts, outreach waves, walk-in reservations and price-floor storage. | I could compare evidence and resolve implementation questions before they became rework in the app. |
-| **Core implementation · 9 Oct onward** | I prioritised the chair board and offer-to-payment journey. I chose a simulated WhatsApp interface, functional text input and Razorpay test Checkout. I required prices, floors and permitted times to be enforced in code. | Claude Code implemented the schema, synthetic data, forecast, ranking, structured model actions, board updates and payment flow. | One build covered the interface, database and agent behaviour, giving me a complete journey to test early. |
-| **Design and iteration · 9–11 Oct** | I rejected the first interface as too generic, chose the Strand & Co. identity and staff-column calendar, and specified one focus per stage. I defined the questions the daily report should answer. | Claude Design helped produce visual references. ChatGPT generated report mockups and interactive HTML; Claude Code implemented the selected direction and my annotations. | I could review concrete alternatives, then revise layout and interaction without manually rebuilding each version. Some HTML exports needed correction. |
-| **Testing and correction · 9–12 Oct** | I supplied walkthrough feedback and acceptance rules. A plan edit must not approve sending; simulated buyers must not take the live customer's slot; discounts must follow my price rules. I chose which review findings to fix. | Claude Code traced failures, changed the implementation and wrote repeatable demo checks. ChatGPT separately checked report arithmetic, revenue attribution, budget reservations and capacity units. | Reviews covered both software behaviour and whether the numbers made sense. A scripted test turned repeated walkthrough requirements into a reusable check. |
-| **Scope and deployment · 12 Oct** | I cut agent-to-agent negotiation, retained the core salon journey and chose to record the deployed app. | Claude Code removed the extra flow, ran the journey with the tour on and off, addressed a flagged framework version and diagnosed deployment latency. | I could simplify and stabilise the submission rather than spending the final day only on setup and debugging. |
-| **Submission review · 12–13 Oct** | I selected the final claims, metric and wording. I retained incremental merchant revenue as the north star because that is the value I wanted RAY to deliver. | ChatGPT compared the note with the challenge brief and BTC handbook, checked selected sources, flagged unsupported certainty and helped edit the note and this log. | I got a separate review of the argument and evidence, including the distinction between synthetic demo results and proven merchant impact. |
+| **Research and specification** | I conducted customer and owner conversations, explored the opportunity, tried Razorpay's existing agents and chose the salon use case. I set the product logic and demo requirements. | Claude supported secondary research and helped structure and stress-test the PRD. It raised inconsistencies in customer counts, outreach waves, walk-in reservations and price-floor storage. | I could compare evidence and resolve implementation questions before they became rework in the app. |
+| **Core implementation** | I prioritised the chair board and offer-to-payment journey. I chose a simulated WhatsApp interface, functional text input and Razorpay test Checkout. I required prices, floors and permitted times to be enforced in code. | Claude Code implemented the schema, synthetic data, forecast, ranking, structured model actions, board updates and payment flow. | One build covered the interface, database and agent behaviour, giving me a complete journey to test early. |
+| **Design and iteration** | I rejected the first interface as too generic, chose the Strand & Co. identity and staff-column calendar, and specified one focus per stage. I defined the questions the daily report should answer. | Claude Design helped produce visual references. ChatGPT generated report mockups and interactive HTML; Claude Code implemented the selected direction and my annotations. | I could review concrete alternatives, then revise layout and interaction without manually rebuilding each version. Some HTML exports needed correction. |
+| **Testing and correction** | I supplied walkthrough feedback and acceptance rules. A plan edit must not approve sending; simulated buyers must not take the live customer's slot; discounts must follow my price rules. I chose which review findings to fix. | Claude Code traced failures, changed the implementation and wrote repeatable demo checks. ChatGPT separately checked report arithmetic, revenue attribution, budget reservations and capacity units. | Reviews covered both software behaviour and whether the numbers made sense. A scripted test turned repeated walkthrough requirements into a reusable check. |
+| **Scope and deployment** | I cut agent-to-agent negotiation, retained the core salon journey and chose to record the deployed app. | Claude Code removed the extra flow, ran the journey with the tour on and off, addressed a flagged framework version and diagnosed deployment latency. | I could simplify and stabilise the submission rather than spending the final day only on setup and debugging. |
+| **Submission review** | I selected the final claims, metric and wording. I retained incremental merchant revenue as the north star because that is the value I wanted RAY to deliver. | ChatGPT compared the note with the challenge brief, checked selected sources, flagged unsupported certainty and helped edit the note and this log. | I got a separate review of the argument and evidence, including the distinction between synthetic demo results and proven merchant impact. |
 
 ## Tools used
 
@@ -55,6 +53,6 @@ That supervision mattered. A configuration error made scripted replies appear to
 
 ## What the prototype demonstrates
 
-The salon, customers, history, network signals and partner funding are synthetic. WhatsApp is simulated, and Razorpay uses test mode with no real money moving. Earlier work included webhooks; the final deployment notes record Checkout confirmation as the demo path, without completing the deployed webhook setup.
+The salon, customers, history, network signals and partner funding are synthetic. WhatsApp is simulated, and Razorpay uses test mode with no real money moving.
 
 The prototype demonstrates the proposed workflow and learning loop. Actual merchant uplift and improvement in forecasts or targeting still need validation in a pilot with a control group.
