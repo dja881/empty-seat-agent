@@ -1,6 +1,6 @@
 # RAY · AI build log
 
-**Daivik John Alva | Razorpay × ISB AI PM Build Challenge | 9–13 October 2026**
+**Daivik John Alva | Razorpay × ISB AI PM Build Challenge | 23 September–13 October 2026**
 
 ## How I used AI
 
@@ -32,6 +32,7 @@ The supporting stack was Next.js, Supabase, Vercel and Razorpay test mode. Supab
 
 | Date | What I directed or decided | What AI researched, implemented or checked |
 | --- | --- | --- |
+| **23 Sep–9 Oct: building out the PRD** | I did the primary research (conversations with salon customers and owners) and secondary research on the market and existing tools, ideated on the problem and the solution, and tested Razorpay's existing agents to see what they already do and where the gap is. I chose the problem, the merchant segment and the product logic, and wrote the PRD that the build started from. | Claude supported the secondary research, challenged the ideas and the assumptions behind them, and helped structure and draft the PRD from my direction. |
 | **9 Oct: specification and data** | I supplied the PRD and required a coherent demo day. I chose a separate database project so resetting the demo could not affect other work. | Claude Code identified conflicts in wave sizes, customer counts, walk-in reservations and price-floor storage. It created the schema and reproducible synthetic data: 60 customers, 90 days of history and nearby payment activity. |
 | **9 Oct: core flow** | I prioritised the chair board and the offer-to-payment journey. I chose a simulated WhatsApp interface to avoid API setup risk, while keeping customer text input and Razorpay test Checkout functional. Prices, permitted times and floors had to be enforced in code. | Claude Code implemented the forecast, customer ranking, structured Qwen actions, live board updates and payment flow. It wrote the transaction logic for resolving competing payments and overlapping offers. |
 | **9 Oct: interface review** | I rejected the first interface as too generic. I wanted a familiar salon workspace, staff columns, a live customer conversation and one clear focus at each stage. Changing a plan had to remain separate from approving it. | AI examined salon-software layouts, rebuilt the screens from my references and feedback, and corrected cases where a price change incorrectly triggered sending. |
