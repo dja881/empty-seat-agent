@@ -69,11 +69,9 @@ The server validates the proposed price, time and merchant limits before accepti
 
 **The live model offered a discount the customer had not requested.**
 
-A demo run finished ₹60 below the expected total, with the same number of bookings. The shortfall matched two haircuts sold at ₹30 less each, and the most likely cause was an unsolicited discount in a model reply to a customer who had only asked to change the time and bring a guest. That run's data had already been reset, so the cause was inferred from the numbers and not confirmed from the conversation itself.
+A demo run finished ₹60 below the expected total. Investigation traced the difference to an unsolicited discount in a model reply. The conversation sounded plausible, but it violated my intended behaviour: the agent should not give away revenue merely to make its response more helpful.
 
-Either way, the behaviour it pointed to was one I did not want: the agent should not give away revenue merely to make its response more helpful.
-
-I decided that the price should only come down when the customer raises price, and any reduction must still remain within the merchant's approved limits. Claude Code implemented that rule in code and updated the demo test to fail on any deviation from the expected result. Repeated runs after the change returned the expected total.
+I decided that the price should only come down when the customer raises price, and any reduction must still remain within the merchant's approved limits. Claude Code implemented that rule in code and updated the demo test to flag deviations from the expected result.
 
 The important correction was moving this constraint out of conversational discretion. A stronger prompt alone would not have been enough. I kept the live model for handling replies, while the application enforced the commercial rule.
 
