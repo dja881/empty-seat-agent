@@ -47,17 +47,21 @@ These summarise the instructions used during the build; they are not verbatim pr
 
 > Check each walkthrough finding against the current code before changing it. Fix reproducible issues, preserve the approved journey and run the demo checks before merging.
 
-### Instructions in my own words
+### Representative instructions reconstructed from my product decisions
 
-Three messages from the build, lightly tidied, that changed its direction:
+These are reconstructed from the decisions I made during the project. They are not exact messages.
 
-> Don't make it look too AI. Do some research, look at similar products and find a more realistic design.
+**1. Turning customer research into a trust requirement**
 
-> Show only the optimal core user journey. At every stage the person watching should be focused.
+> Customers told me an unexpected discount link feels like a scam and they would rather call the receptionist. I want the offer to feel like an interaction with their existing salon. Work through the journey from receiving the message to paying: use the salon's identity, sign it with the receptionist's name and keep a clear option to call. Identify where someone might hesitate and how the front desk can help them complete the same booking. Keep the experience inside the existing customer relationship.
 
-> I'm scared that making these changes will break something in our current codebase. Is there a way we can ensure that doesn't happen?
+**2. Defining success from the owner's perspective**
 
-The first led to rebuilding the interface around how salon software lays out a day. The second removed clutter from every screen. The third produced the branch-and-test routine used for every later change.
+> At 8 pm, the owner needs to know whether RAY actually added money, what it cost, whether offers stayed within budget and what should change next. Build the report around those questions. Don't count every agent booking as incremental revenue: some customers would have booked anyway. Stress-test the calculation for discounts, fees, bank funding and refunds, and distinguish estimates from recorded payments. Keep the main screen simple, with the calculation available on demand.
+
+**3. Cutting an impressive feature to protect the core journey**
+
+> I'm removing agent-to-agent negotiation from the submission because it distracts from the problem we are trying to prove. The demo should follow one salon through approving a plan, reaching suitable customers, collecting payment and reviewing the result. Review each screen against that journey. Flag anything that adds explanation or interaction without helping the owner fill empty time, control the offers or understand the outcome. Show me the trade-offs before changing the scope.
 
 ### Agent setup inside RAY
 
