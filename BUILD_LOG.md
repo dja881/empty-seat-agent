@@ -12,7 +12,6 @@ Starting from the PRD and specification I had developed, I used AI to build and 
 
 | Evidence from the build | How AI increased my output |
 | --- | --- |
-| **4 days of implementation and iteration** | Claude Code translated my requirements into working versions across the interface, backend and integrations, allowing me to review behaviour throughout the build. |
 | **11 core database tables plus a demo-state table** | AI wrote the schema and seed generator rather than requiring me to create and populate each table manually. |
 | **60 synthetic customers and 90 days of booking history** | A reproducible generator covered due, lapsed, regular, VIP, opted-out and other customer types, so I could test targeting and repeat the demo consistently. |
 | **4 stages in the main journey** | Morning plan, customer selection, live sales and day report were implemented as one guided flow, with a **10-step optional tour** for judges. |
