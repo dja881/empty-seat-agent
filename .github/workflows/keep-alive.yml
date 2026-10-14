@@ -1,12 +1,16 @@
 # Keeps the live demo awake while judges review it. Supabase pauses free projects after about
 # a week without activity, so this reads the day report (read-only: it changes nothing in the
-# demo) twice a day, and fails loudly if the site or the database stops answering.
+# demo) twice a day. If the site or the database stops answering, it opens a GitHub issue
+# assigned to the repo owner, which GitHub emails to them.
 name: Keep demo awake
 
 on:
   schedule:
     - cron: "30 2,14 * * *"   # 08:00 and 20:00 IST
   workflow_dispatch:
+
+permissions:
+  issues: write
 
 jobs:
   ping:
@@ -18,3 +22,12 @@ jobs:
           curl -fsS --max-time 30 https://empty-seat-agent.vercel.app/ -o /dev/null
           curl -fsS --max-time 30 https://empty-seat-agent.vercel.app/api/report | grep -q '"openUnits"'
           echo "Site and database answered."
+
+      - name: Raise an alert if the check failed
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create -R "$GITHUB_REPOSITORY" --assignee dja881 \
+            --title "Live demo check failed $(date -u +'%d %b %H:%M') UTC" \
+            --body "The twice-daily check could not load https://empty-seat-agent.vercel.app or its day report. Open the site to confirm. If the page loads with no data, the Supabase project has probably paused: restore it from the Supabase dashboard. Run details: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
