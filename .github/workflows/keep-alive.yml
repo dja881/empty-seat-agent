@@ -1,0 +1,20 @@
+# Keeps the live demo awake while judges review it. Supabase pauses free projects after about
+# a week without activity, so this reads the day report (read-only: it changes nothing in the
+# demo) twice a day, and fails loudly if the site or the database stops answering.
+name: Keep demo awake
+
+on:
+  schedule:
+    - cron: "30 2,14 * * *"   # 08:00 and 20:00 IST
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the live site and its database
+        run: |
+          set -e
+          curl -fsS --max-time 30 https://empty-seat-agent.vercel.app/ -o /dev/null
+          curl -fsS --max-time 30 https://empty-seat-agent.vercel.app/api/report | grep -q '"openUnits"'
+          echo "Site and database answered."
