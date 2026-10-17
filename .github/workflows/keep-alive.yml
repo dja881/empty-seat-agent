@@ -1,12 +1,14 @@
 # Keeps the live demo awake while judges review it. Supabase pauses free projects after about
 # a week without activity, so this reads the day report (read-only: it changes nothing in the
-# demo) twice a day. If the site or the database stops answering, it opens a GitHub issue
+# demo) once a day, in the morning. If the site or the database stops answering, it opens a GitHub issue
 # assigned to the repo owner, which GitHub emails to them.
 name: Keep demo awake
 
 on:
   schedule:
-    - cron: "30 2,14 * * *"   # 08:00 and 20:00 IST
+    # 07:07 IST. GitHub often starts scheduled runs late (3 to 5 hours was seen here), and an odd
+    # minute avoids the busiest top-of-hour queue.
+    - cron: "37 1 * * *"
   workflow_dispatch:
 
 permissions:
