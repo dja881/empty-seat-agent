@@ -6,9 +6,10 @@ name: Keep demo awake
 
 on:
   schedule:
-    # 07:07 IST. GitHub often starts scheduled runs late (3 to 5 hours was seen here), and an odd
-    # minute avoids the busiest top-of-hour queue.
-    - cron: "37 1 * * *"
+    # Scheduled for 03:07 IST so it lands between 7 and 9 am. GitHub started this check's morning
+    # runs 4.6 to 5.1 hours late (15 to 17 Oct), which puts it at about 7:45 to 8:15 am IST. If
+    # GitHub runs it on time, it simply happens at 3:07 am, still before 9 am.
+    - cron: "37 21 * * *"
   workflow_dispatch:
 
 permissions:
